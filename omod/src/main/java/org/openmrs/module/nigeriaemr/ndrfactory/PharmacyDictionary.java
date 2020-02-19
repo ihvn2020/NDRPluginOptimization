@@ -530,7 +530,7 @@ public class PharmacyDictionary {
                     cst.setCodeDescTxt(getRegimenCodeDescTextMapValue(obs.getValueCoded().getConceptId()));
                     regimenType.setPrescribedRegimen(cst);
                 } catch (Exception ex) {
-                    LoggerUtils.write(PharmacyDictionary.class.getName(), "Error on OI_Drug_Concept_Id: " + ex.getMessage(), LogFormat.FATAL, LogLevel.live);
+                   // LoggerUtils.write(PharmacyDictionary.class.getName(), "Error on OI_Drug_Concept_Id: " + ex.getMessage(), LogFormat.FATAL, LogLevel.live);
                 }
             }
 
@@ -542,7 +542,7 @@ public class PharmacyDictionary {
                     regimenType.setPrescribedRegimenTypeCode("TB");
                 }
             } catch (Exception ex) {
-                LoggerUtils.write(PharmacyDictionary.class.getName(), "Error on OI_regimen_Concept_set: " + ex.getMessage(), LogFormat.FATAL, LogLevel.live);
+                //LoggerUtils.write(PharmacyDictionary.class.getName(), "Error on OI_regimen_Concept_set: " + ex.getMessage(), LogFormat.FATAL, LogLevel.live);
             }
 
             //set duration
@@ -574,7 +574,7 @@ public class PharmacyDictionary {
 
             return regimenType;
         } catch (Exception ex) {
-            LoggerUtils.write(PharmacyDictionary.class.getName(), Arrays.toString(ex.getStackTrace()), LogFormat.FATAL, LogLevel.live);
+           // LoggerUtils.write(PharmacyDictionary.class.getName(), Arrays.toString(ex.getStackTrace()), LogFormat.FATAL, LogLevel.live);
             throw new DatatypeConfigurationException(Arrays.toString(ex.getStackTrace()));
         }
     }
@@ -597,8 +597,8 @@ public class PharmacyDictionary {
                     groupObsSet.add(ele.getObsGroup());
                 }
             } catch (Exception ex) {
-                LoggerUtils.write(PharmacyDictionary.class.getName(), "Error on OI_regimen_Concept_set & TB_regimen_Concept_set: " + ex.getMessage(), LogFormat.FATAL, LogLevel.live);
-                throw new DatatypeConfigurationException(Arrays.toString(ex.getStackTrace()));
+                //LoggerUtils.write(PharmacyDictionary.class.getName(), "Error on OI_regimen_Concept_set & TB_regimen_Concept_set: " + ex.getMessage(), LogFormat.FATAL, LogLevel.live);
+                //throw new DatatypeConfigurationException(Arrays.toString(ex.getStackTrace()));
             }
         }
         for (Obs ele : groupObsSet) {
@@ -613,8 +613,8 @@ public class PharmacyDictionary {
                 }
                 drugObsList.clear();
             } catch (Exception ex) {
-                LoggerUtils.write(PharmacyDictionary.class.getName(), Arrays.toString(ex.getStackTrace()), LogFormat.DEBUG, LogLevel.live);
-                throw new DatatypeConfigurationException(Arrays.toString(ex.getStackTrace()));
+                //LoggerUtils.write(PharmacyDictionary.class.getName(), Arrays.toString(ex.getStackTrace()), LogFormat.DEBUG, LogLevel.live);
+                //throw new DatatypeConfigurationException(Arrays.toString(ex.getStackTrace()));
             }
         }
         return regimenTypeList;

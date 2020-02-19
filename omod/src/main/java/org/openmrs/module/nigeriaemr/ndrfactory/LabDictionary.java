@@ -216,9 +216,9 @@ public class LabDictionary {
             //  if (pmtctIdentifier != null || htsIdentifier != null) {
             Obs obs = extractObs(Visit_Type_Concept_Id, labObsList);
             if (obs != null && obs.getValueCoded() != null) {
-                LoggerUtils.write(LabDictionary.class.getName(), "About to pull Visit_Type_Concept_Id", LogFormat.FATAL, LogLevel.debug);
+                //LoggerUtils.write(LabDictionary.class.getName(), "About to pull Visit_Type_Concept_Id", LogFormat.FATAL, LogLevel.debug);
                 labReportType.setBaselineRepeatCode(getMappedAnswerValue(obs.getValueCoded().getConceptId()));
-                LoggerUtils.write(LabDictionary.class.getName(), "Finished pulling Visit_Type_Concept_Id", LogFormat.FATAL, LogLevel.debug);
+                //LoggerUtils.write(LabDictionary.class.getName(), "Finished pulling Visit_Type_Concept_Id", LogFormat.FATAL, LogLevel.debug);
             }
 
             obs = extractObs(Laboratory_Identifier_Concept_Id, labObsList);
@@ -253,7 +253,7 @@ public class LabDictionary {
             //  return labReportType;
 
         } catch (Exception ex) {
-            LoggerUtils.write(LabDictionary.class.getName(), ex.getMessage(), LogFormat.FATAL, LogLevel.live);
+            //LoggerUtils.write(LabDictionary.class.getName(), ex.getMessage(), LogFormat.FATAL, LogLevel.live);
             System.out.println(ex.getMessage());
             // throw new DatatypeConfigurationException(Arrays.toString(ex.getStackTrace()));
         }
@@ -338,11 +338,11 @@ OtherLaboratoryInformation
                 try {
                     ndrCodedValue = getMappedValue(conceptID);
 
-                    LoggerUtils.write(LabDictionary.class.getName(), "About to pull Laboratory_Result_TEST", LogFormat.FATAL, LogLevel.debug);
+                    //LoggerUtils.write(LabDictionary.class.getName(), "About to pull Laboratory_Result_TEST", LogFormat.FATAL, LogLevel.debug);
                     cst.setCode(Integer.toString(ndrCodedValue));
                     cst.setCodeDescTxt(obs.getConcept().getName().getName());
                     labOrderAndResult.setLaboratoryResultedTest(cst);
-                    LoggerUtils.write(LabDictionary.class.getName(), "Finished pulling Laboratory_Result_TEST", LogFormat.FATAL, LogLevel.debug);
+                    //LoggerUtils.write(LabDictionary.class.getName(), "Finished pulling Laboratory_Result_TEST", LogFormat.FATAL, LogLevel.debug);
 
                     answer = new AnswerType();
                     numeric = new NumericType();
@@ -374,7 +374,7 @@ OtherLaboratoryInformation
                     labResultList.add(labOrderAndResult);
 
                 } catch (Exception ex) {
-                    LoggerUtils.write(LabDictionary.class.getName(), "Error in Numeric_DataType_Concept_Id: " + ex.getMessage(), LogFormat.FATAL, LogLevel.live);
+                    //LoggerUtils.write(LabDictionary.class.getName(), "Error in Numeric_DataType_Concept_Id: " + ex.getMessage(), LogFormat.FATAL, LogLevel.live);
                     // throw new DatatypeConfigurationException(Arrays.toString(ex.getStackTrace()));
                 }
 
@@ -382,7 +382,7 @@ OtherLaboratoryInformation
                 try {
                     cst = new CodedSimpleType();
 
-                    LoggerUtils.write(LabDictionary.class.getName(), "About to pull Coded_DataType_ConceptId", LogFormat.FATAL, LogLevel.debug);
+                    //LoggerUtils.write(LabDictionary.class.getName(), "About to pull Coded_DataType_ConceptId", LogFormat.FATAL, LogLevel.debug);
                     //set the lab test code
                     ndrCodedValue = getMappedValue(conceptID);
                     cst.setCode(Integer.toString(ndrCodedValue));
@@ -407,7 +407,7 @@ OtherLaboratoryInformation
                     labOrderAndResult.setResultedTestDate(getXmlDate(enc.getEncounterDatetime()));
                     labResultList.add(labOrderAndResult);
                 } catch (Exception ex) {
-                    LoggerUtils.write(LabDictionary.class.getName(), "Error in Coded_DataType_ConceptId: " + ex.getMessage(), LogFormat.FATAL, LogLevel.live);
+                    //LoggerUtils.write(LabDictionary.class.getName(), "Error in Coded_DataType_ConceptId: " + ex.getMessage(), LogFormat.FATAL, LogLevel.live);
                     // throw new DatatypeConfigurationException(Arrays.toString(ex.getStackTrace()));
                 }
             }

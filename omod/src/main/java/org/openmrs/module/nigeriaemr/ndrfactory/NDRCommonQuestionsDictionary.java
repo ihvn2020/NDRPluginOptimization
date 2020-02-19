@@ -310,7 +310,7 @@ public class NDRCommonQuestionsDictionary {
 
             return demo;
         } catch (Exception ex) {
-            LoggerUtils.write(NDRMainDictionary.class.getName(), ex.getMessage(), LoggerUtils.LogFormat.FATAL, LoggerUtils.LogLevel.live);
+            //LoggerUtils.write(NDRMainDictionary.class.getName(), ex.getMessage(), LoggerUtils.LogFormat.FATAL, LoggerUtils.LogLevel.live);
             //throw new DatatypeConfigurationException(Arrays.toString(ex.getStackTrace()));
         }
         
@@ -402,7 +402,7 @@ public class NDRCommonQuestionsDictionary {
             return fingerPrintsType;
         } catch (SQLException e) {
             e.printStackTrace();
-            LoggerUtils.write(NDRMainDictionary.class.getName(), e.getMessage(), LogFormat.FATAL, LoggerUtils.LogLevel.live.live);
+            //LoggerUtils.write(NDRMainDictionary.class.getName(), e.getMessage(), LogFormat.FATAL, LoggerUtils.LogLevel.live.live);
         } catch (DatatypeConfigurationException e) {
             e.printStackTrace();
         }

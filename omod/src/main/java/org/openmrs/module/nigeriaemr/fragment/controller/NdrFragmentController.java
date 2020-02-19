@@ -136,25 +136,25 @@ public class NdrFragmentController {
 				
 				//	if (patient.getId() == 497) {
 				try {
-					LoggerUtils.write(NdrFragmentController.class.getName(),
-					    "#################### #################### ####################", LogFormat.FATAL, LogLevel.live);
-					LoggerUtils.write(NdrFragmentController.class.getName(), "Started Export for patient with id: "
-					        + patient.getId(), LoggerUtils.LogFormat.INFO, LogLevel.live);
+					//LoggerUtils.write(NdrFragmentController.class.getName(),
+					   // "#################### #################### ####################", LogFormat.FATAL, LogLevel.live);
+					//LoggerUtils.write(NdrFragmentController.class.getName(), "Started Export for patient with id: "
+					       // + patient.getId(), LoggerUtils.LogFormat.INFO, LogLevel.live);
 					
 					cnt = generator.createContainer(patient, facility);
 					
 				}
 				catch (Exception ex) {
-					LoggerUtils.write(
-					    NdrFragmentController.class.getName(),
-					    MessageFormat.format("Could not parse patient with id: {0},{1},{2} ",
-					        Integer.toString(patient.getId()), "\r\n", ex.getMessage()), LogFormat.FATAL, LogLevel.live);
-					cnt = null;
+					//LoggerUtils.write(
+					    //NdrFragmentController.class.getName(),
+					    //MessageFormat.format("Could not parse patient with id: {0},{1},{2} ",
+					       // Integer.toString(patient.getId()), "\r\n", ex.getMessage()), LogFormat.FATAL, LogLevel.live);
+					//cnt = null;
 				}
 				
 				if (cnt != null) {
-					LoggerUtils.write(NdrFragmentController.class.getName(),
-					    "Got data for patient with ID: " + patient.getId(), LogFormat.INFO, LogLevel.live);
+					//LoggerUtils.write(NdrFragmentController.class.getName(),
+					    //"Got data for patient with ID: " + patient.getId(), LogFormat.INFO, LogLevel.live);
 					try {
 						
 						String pepFarId = Utils.getPatientPEPFARId(patient);
@@ -184,15 +184,15 @@ public class NdrFragmentController {
 						generator.writeFile(cnt, aXMLFile, jaxbMarshaller);
 					}
 					catch (Exception ex) {
-						LoggerUtils.write(NdrFragmentController.class.getName(), ex.getMessage(), LogFormat.FATAL,
-						    LogLevel.live);
+						//LoggerUtils.write(NdrFragmentController.class.getName(), ex.getMessage(), LogFormat.FATAL,
+						    //LogLevel.live);
 					}
 				}
 				
 				long endTime = System.currentTimeMillis();
-				LoggerUtils.write(NdrFragmentController.class.getName(),
-				    "Finished Export for patient with id: " + patient.getId() + " Time Taken: " + (endTime - startTime)
-				            + " milliseconds", LoggerUtils.LogFormat.INFO, LogLevel.live);
+				//LoggerUtils.write(NdrFragmentController.class.getName(),
+				    //"Finished Export for patient with id: " + patient.getId() + " Time Taken: " + (endTime - startTime)
+				            //+ " milliseconds", LoggerUtils.LogFormat.INFO, LogLevel.live);
 				System.out.println("generating ndr took : " + (endTime - startTime) + " milli secs : ");
 				
 				long loop_end_time = System.currentTimeMillis();
@@ -211,8 +211,8 @@ public class NdrFragmentController {
 			//request.getContextPath() + "/downloads/" + zipFileName;
 		}
 		catch (Exception ex) {
-			LoggerUtils.write(NdrFragmentController.class.getName(), ex.getMessage(), LoggerUtils.LogFormat.FATAL,
-			    LogLevel.live);
+			//LoggerUtils.write(NdrFragmentController.class.getName(), ex.getMessage(), LoggerUtils.LogFormat.FATAL,
+			  //  LogLevel.live);
 			//Update ndr last run date
 			Utils.updateLast_NDR_Run_Date(new Date());
 			

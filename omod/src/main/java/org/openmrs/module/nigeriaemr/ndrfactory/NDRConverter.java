@@ -134,7 +134,7 @@ public class NDRConverter {
             container.setIndividualReport(individualReportType);
             return container;
         } catch (Exception ex) {
-            LoggerUtils.write(NDRConverter.class.getName(), ex.getMessage(), LoggerUtils.LogFormat.FATAL, LogLevel.live);
+            //LoggerUtils.write(NDRConverter.class.getName(), ex.getMessage(), LoggerUtils.LogFormat.FATAL, LogLevel.live);
             // throw new DatatypeConfigurationException(Arrays.toString(ex.getStackTrace()));
         }
         return container;
@@ -172,7 +172,7 @@ public class NDRConverter {
                     List<HIVTestingReportType> hivReportTypes = createHIVTestingReport(intakeEncounter, intakeObs);
                     individualReport.getHIVTestingReport().addAll(hivReportTypes);
                 } catch (Exception ex) {
-                    LoggerUtils.write(NDRConverter.class.getName(), ex.getMessage(), LoggerUtils.LogFormat.FATAL, LogLevel.live);
+                   // LoggerUtils.write(NDRConverter.class.getName(), ex.getMessage(), LoggerUtils.LogFormat.FATAL, LogLevel.live);
                 }
                 //  }
             }
@@ -261,7 +261,7 @@ public class NDRConverter {
             hivTestingReportList.add(hivTestingReport);
 
         } catch (Exception ex) {
-            LoggerUtils.write(NDRConverter.class.toString(), ex.getMessage(), LoggerUtils.LogFormat.FATAL, LogLevel.live);
+            //LoggerUtils.write(NDRConverter.class.toString(), ex.getMessage(), LoggerUtils.LogFormat.FATAL, LogLevel.live);
         }
 
         return hivTestingReportList;
@@ -330,8 +330,8 @@ public class NDRConverter {
                     condition.getPartnerDetails().addAll(partnerDetailsType);
                 }
             } catch (Exception ex) {
-                LoggerUtils.write(NDRMainDictionary.class.getName(), ex.getMessage(), LoggerUtils.LogFormat.FATAL,
-                        LogLevel.live);
+                //LoggerUtils.write(NDRMainDictionary.class.getName(), ex.getMessage(), LoggerUtils.LogFormat.FATAL,
+                     //   LogLevel.live);
             }
 
             List<RegimenType> arvRegimenTypeList = mainDictionary.createRegimenTypeList(patient, encounters, this.allobs);
@@ -413,8 +413,8 @@ public class NDRConverter {
 			}
 			catch (SQLException e) {
 				e.printStackTrace();
-				LoggerUtils.write(NDRMainDictionary.class.getName(), e.getMessage(), LoggerUtils.LogFormat.FATAL,
-				    LogLevel.live);
+				//LoggerUtils.write(NDRMainDictionary.class.getName(), e.getMessage(), LoggerUtils.LogFormat.FATAL,
+				  //  LogLevel.live);
 			}
 			finally {
 				
