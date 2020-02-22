@@ -5,7 +5,6 @@
  */
 package org.openmrs.module.nigeriaemr.ndrfactory;
 
-import com.sun.corba.se.impl.orbutil.closure.Constant;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -16,8 +15,6 @@ import org.openmrs.Encounter;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.module.nigeriaemr.model.ndr.*;
-import org.openmrs.module.nigeriaemr.ndrUtils.LoggerUtils;
-import org.openmrs.module.nigeriaemr.ndrUtils.LoggerUtils.LogFormat;
 import org.openmrs.module.nigeriaemr.ndrUtils.Utils;
 
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -28,7 +25,6 @@ import java.util.Map;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.module.nigeriaemr.model.ndr.AntenatalRegistrationType.Syphilis;
 import org.openmrs.module.nigeriaemr.ndrUtils.ConstantsUtil;
-import org.openmrs.module.nigeriaemr.ndrUtils.LoggerUtils.LogLevel;
 
 import static org.openmrs.module.nigeriaemr.ndrUtils.Utils.extractObs;
 
