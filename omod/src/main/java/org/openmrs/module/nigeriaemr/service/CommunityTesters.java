@@ -46,7 +46,7 @@ public class CommunityTesters {
 			}
 			catch (SQLException ex) {
 				//LoggerUtils.write(CommunityTesters.class.getName(), ex.getMessage(), LoggerUtils.LogFormat.FATAL,
-				  //  LoggerUtils.LogLevel.live);
+				//  LoggerUtils.LogLevel.live);
 			}
 		}
 	}
