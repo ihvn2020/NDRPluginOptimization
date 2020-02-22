@@ -4,12 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.*;
-import java.time.LocalDate;
-import java.time.Month;
 import java.util.*;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
@@ -19,7 +15,6 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
-import org.joda.time.DateTimeComparator;
 
 import org.openmrs.*;
 import org.openmrs.api.context.Context;
@@ -28,10 +23,8 @@ import org.openmrs.module.nigeriaemr.ndrUtils.ConstantsUtil;
 import org.openmrs.module.nigeriaemr.ndrUtils.Utils;
 import org.openmrs.module.nigeriaemr.ndrUtils.Validator;
 import org.openmrs.module.nigeriaemr.ndrUtils.CustomErrorHandler;
-import org.openmrs.module.nigeriaemr.ndrUtils.LoggerUtils;
 import org.xml.sax.SAXException;
 
-import org.openmrs.module.nigeriaemr.ndrUtils.LoggerUtils.LogLevel;
 import org.openmrs.module.nigeriaemr.omodmodels.DBConnection;
 
 public class NDRConverter {

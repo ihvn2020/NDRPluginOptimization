@@ -129,7 +129,6 @@ public class NdrFragmentController {
 			int counter = 0;
 			Container cnt = null;
 			for (Patient patient : filteredPatients) {
-				
 				long startTime = System.currentTimeMillis();
 				counter++;
 				System.out.println("pateint  " + counter + " of " + filteredPatients.size() + " with ID " + patient.getId());
