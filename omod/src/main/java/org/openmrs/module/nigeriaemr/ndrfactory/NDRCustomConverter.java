@@ -10,6 +10,7 @@ import java.util.Calendar;
 import java.util.UUID;
 import javax.xml.datatype.DatatypeConfigurationException;
 import org.openmrs.module.nigeriaemr.model.ndr.FacilityType;
+import org.openmrs.module.nigeriaemr.model.ndr.IndividualReportType;
 import org.openmrs.module.nigeriaemr.model.ndr.MessageHeaderType;
 import org.openmrs.module.nigeriaemr.ndrUtils.Utils;
 
@@ -39,6 +40,11 @@ public class NDRCustomConverter {
         header.setMessageUniqueID(UUID.randomUUID().toString());
         header.setMessageSendingOrganization(facilityType);
         return header;
+    }
+    public IndividualReportType createIndividualReportType(){
+        IndividualReportType individualReport=new IndividualReportType();
+        
+        return individualReport;
     }
     
 }
