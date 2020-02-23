@@ -14,6 +14,20 @@ import java.util.Date;
 public class CustomObs implements Comparable<CustomObs> {
 
     /**
+     * @return the encounterTypeID
+     */
+    public int getEncounterTypeID() {
+        return encounterTypeID;
+    }
+
+    /**
+     * @param encounterTypeID the encounterTypeID to set
+     */
+    public void setEncounterTypeID(int encounterTypeID) {
+        this.encounterTypeID = encounterTypeID;
+    }
+
+    /**
      * @return the obsID
      */
     public int getObsID() {
@@ -435,6 +449,7 @@ public class CustomObs implements Comparable<CustomObs> {
     private int obsID;
     private int patientID;
     private int encounterID;
+    private int encounterTypeID;
     private String pepfarID;
     private String hospID;
     private Date visitDate;

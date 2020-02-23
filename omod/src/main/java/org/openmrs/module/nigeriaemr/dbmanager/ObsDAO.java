@@ -6,7 +6,6 @@
 package org.openmrs.module.nigeriaemr.dbmanager;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -14,9 +13,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import org.openmrs.module.nigeriaemr.ndrUtils.Utils;
 import org.openmrs.module.nigeriaemr.omodmodels.CustomObs;
-import org.openmrs.module.nigeriaemr.omodmodels.DBConnection;
 
 /**
  *
@@ -62,6 +59,7 @@ public class ObsDAO {
         cobs.setEnteredBy(rs.getString("entered_by"));
         cobs.setDateEntered(rs.getDate("date_created"));
         cobs.setDateChanged(rs.getDate("date_changed"));
+        cobs.setEncounterTypeID(rs.getInt("encounter_type"));
         // cobs.setProvider(rs.getString("PROVIDER"));
         cobs.setUuid(rs.getString("uuid"));
         //cobs.setLocationName(rs.getString("LOCATION"));
@@ -130,7 +128,7 @@ public class ObsDAO {
                     java.sql.ResultSet.CONCUR_READ_ONLY);
             stmt.setFetchSize(Integer.MIN_VALUE);
             rs = stmt.executeQuery(sql_text);
-            while (rs.next()) {
+            while(rs.next()) {
                 obs = convertResultSetToCustomObs(rs);
                 obsList.add(obs);
             }

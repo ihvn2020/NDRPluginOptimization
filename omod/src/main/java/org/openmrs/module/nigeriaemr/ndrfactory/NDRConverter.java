@@ -28,29 +28,29 @@ import org.xml.sax.SAXException;
 import org.openmrs.module.nigeriaemr.omodmodels.DBConnection;
 
 public class NDRConverter {
-	
-	//Logger logger = Logger.getLogger(NDRConverter.class);
-	private Patient patient;
-	
-	private FacilityType facility;
-	
-	private String ipName;
-	
-	private String ipCode;
-	
-	private List<Encounter> encounters;
-	
-	private List<Obs> allobs;
-	
-	private DBConnection openmrsConn;
-	
-	public NDRConverter(String _ipName, String _ipCode, DBConnection _openmrsConn) {
-		this.ipName = _ipName;
-		this.ipCode = _ipCode;
-		this.openmrsConn = _openmrsConn;
-	}
-	
-	public Container createContainer(Patient pts, FacilityType facility) throws DatatypeConfigurationException {
+
+    //Logger logger = Logger.getLogger(NDRConverter.class);
+    private Patient patient;
+
+    private FacilityType facility;
+
+    private String ipName;
+
+    private String ipCode;
+
+    private List<Encounter> encounters;
+
+    private List<Obs> allobs;
+
+    private DBConnection openmrsConn;
+
+    public NDRConverter(String _ipName, String _ipCode, DBConnection _openmrsConn) {
+        this.ipName = _ipName;
+        this.ipCode = _ipCode;
+        this.openmrsConn = _openmrsConn;
+    }
+
+    public Container createContainer(Patient pts, FacilityType facility) throws DatatypeConfigurationException {
 
         Container container = new Container();
         try {
@@ -96,10 +96,8 @@ public class NDRConverter {
             }
 
             startTime = System.currentTimeMillis();
-          //  this.allobs = Context.getObsService().getObservationsByPerson(pts);
-            
-            
-            
+            //  this.allobs = Context.getObsService().getObservationsByPerson(pts);
+
             endTime = System.currentTimeMillis();
             if ((endTime - startTime) > 1000) {
                 System.out.println("took too loooong to get obs : " + (endTime - startTime) + " milli secs : ");
@@ -109,7 +107,7 @@ public class NDRConverter {
             if (this.encounters == null || this.encounters.isEmpty()) {
                 return null;
             }
-            
+
             this.allobs = Utils.extractObsfromEncounter(filteredEncs);
 
             MessageHeaderType header = createMessageHeaderType();
@@ -132,8 +130,8 @@ public class NDRConverter {
         }
         return container;
     }
-	
-	private IndividualReportType createIndividualReportType() throws DatatypeConfigurationException {
+
+    private IndividualReportType createIndividualReportType() throws DatatypeConfigurationException {
 
         IndividualReportType individualReport = new IndividualReportType();
         try {
@@ -165,7 +163,7 @@ public class NDRConverter {
                     List<HIVTestingReportType> hivReportTypes = createHIVTestingReport(intakeEncounter, intakeObs);
                     individualReport.getHIVTestingReport().addAll(hivReportTypes);
                 } catch (Exception ex) {
-                   // LoggerUtils.write(NDRConverter.class.getName(), ex.getMessage(), LoggerUtils.LogFormat.FATAL, LogLevel.live);
+                    // LoggerUtils.write(NDRConverter.class.getName(), ex.getMessage(), LoggerUtils.LogFormat.FATAL, LogLevel.live);
                 }
                 //  }
             }
@@ -181,8 +179,8 @@ public class NDRConverter {
 
         return individualReport;
     }
-	
-	private List<HIVTestingReportType> createHIVTestingReport(Encounter encounter, List<Obs> allObs) {
+
+    private List<HIVTestingReportType> createHIVTestingReport(Encounter encounter, List<Obs> allObs) {
 
         //TODO: pull hivtestReport as a list
         NDRMainDictionary mainDictionary = new NDRMainDictionary();
@@ -260,8 +258,8 @@ public class NDRConverter {
         return hivTestingReportList;
 
     }
-	
-	private ConditionType createHIVCondition() throws DatatypeConfigurationException {
+
+    private ConditionType createHIVCondition() throws DatatypeConfigurationException {
 
         ConditionType condition = new ConditionType();
 
@@ -301,7 +299,6 @@ public class NDRConverter {
                 condition.setEncounters(encType);
             }
 
-
             List<Encounter> tempEncs = encounters.stream().filter(e -> e.getEncounterType().getEncounterTypeId() == Utils.Laboratory_Encounter_Type_Id).collect(Collectors.toList());
             if (!tempEncs.isEmpty()) {
                 Date artStartdate = Utils.extractARTStartDate(patient, allobs);
@@ -324,7 +321,7 @@ public class NDRConverter {
                 }
             } catch (Exception ex) {
                 //LoggerUtils.write(NDRMainDictionary.class.getName(), ex.getMessage(), LoggerUtils.LogFormat.FATAL,
-                     //   LogLevel.live);
+                //   LogLevel.live);
             }
 
             List<RegimenType> arvRegimenTypeList = mainDictionary.createRegimenTypeList(patient, encounters, this.allobs);
@@ -352,152 +349,148 @@ public class NDRConverter {
 
         return condition;
     }
-	
-	/**
-	 * Create PatientDemographicsType for pts Create CommonQuestionType for pts Create
-	 * HIVQuestionsType for pts Get all Pharmacy visits for patients For each Pharmacy visit create
-	 * RegimenType Get all Clinical visits for patients // For each Clinical visits create
-	 * HIVEncounter // Get all Lab visits for patients // For each of Lab visit create LabReportType
-	 */
-	//
-	private ProgramAreaType createProgramArea() {
-		ProgramAreaType p = new ProgramAreaType();
-		p.setProgramAreaCode("HIV");
-		return p;
-	}
-	
-	private AddressType createPatientAddress() {
-		AddressType p = new AddressType();
-		p.setAddressTypeCode("H");
-		p.setCountryCode("NGA");
-		Connection connection = null;
-		Statement statement = null;
-		
-		PersonAddress pa = patient.getPersonAddress();
-		if (pa != null) {
-			//p.setTown(pa.getAddress1());
-			String lga = pa.getCityVillage();
-			String state = pa.getStateProvince();
-			
-			try {
-				String sql = String
-				        .format(
-				            "SELECT `name`, user_generated_id, 'STATE' AS 'Location' "
-				                    + "FROM address_hierarchy_entry WHERE level_id =2 AND NAME = '%s' "
-				                    + "UNION "
-				                    + "SELECT `name`, user_generated_id, 'LGA' AS 'Location' FROM address_hierarchy_entry "
-				                    + " WHERE level_id =3 AND NAME ='%s' AND parent_id = (SELECT address_hierarchy_entry_id FROM address_hierarchy_entry\n"
-				                    + " WHERE level_id =2 AND NAME = '%s')", state, lga, state);
-				
-				connection = DriverManager.getConnection(this.openmrsConn.getUrl(), this.openmrsConn.getUsername(),
-				    this.openmrsConn.getPassword());
-				statement = connection.createStatement();
-				ResultSet result = statement.executeQuery(sql);
-				while (result.next()) {
-					//String name = result.getString("name");
-					String coded_value = result.getString("user_generated_id");
-					
-					if (result.getString("Location").contains("STATE")) {
-						p.setStateCode(coded_value);
-					} else {
-						p.setLGACode(coded_value);
-					}
-				}
-			}
-			catch (SQLException e) {
-				e.printStackTrace();
-				//LoggerUtils.write(NDRMainDictionary.class.getName(), e.getMessage(), LoggerUtils.LogFormat.FATAL,
-				//  LogLevel.live);
-			}
-			finally {
-				
-				try {
-					if (connection != null) {
-						connection.close();
-					}
-					
-					if (statement != null) {
-						statement.close();
-					}
-					
-				}
-				catch (SQLException ex) {
-					ex.printStackTrace();
-				}
-			}
-			
-		}
-		return p;
-	}
-	
-	private MessageHeaderType createMessageHeaderType() throws DatatypeConfigurationException {
-		MessageHeaderType header = new MessageHeaderType();
-		
-		Calendar cal = Calendar.getInstance();
-		
-		header.setMessageCreationDateTime(Utils.getXmlDateTime(cal.getTime()));
-		header.setMessageStatusCode("INITIAL");
-		header.setMessageSchemaVersion(new BigDecimal("1.4"));
-		header.setMessageUniqueID(UUID.randomUUID().toString());
-		return header;
-	}
-	
-	public Marshaller createMarshaller(JAXBContext jaxbContext) throws JAXBException, SAXException {
-		Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-		
-		SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-		
-		java.net.URL xsdFilePath = Thread.currentThread().getContextClassLoader().getResource("NDR 1.4.xsd");
-		
-		assert xsdFilePath != null;
-		
-		Schema schema = sf.newSchema(xsdFilePath);
-		
-		jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-		jaxbMarshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
-		
-		jaxbMarshaller.setSchema(schema);
-		
-		//Call Validator class to perform the validation
-		jaxbMarshaller.setEventHandler(new Validator());
-		return jaxbMarshaller;
-	}
-	
-	public void writeFile(Container container, File file, Marshaller jaxbMarshaller) throws SAXException, JAXBException,
-	        IOException {
-		
-		CustomErrorHandler errorHandler = new CustomErrorHandler();
-		
-		try {
-			javax.xml.validation.Validator validator = jaxbMarshaller.getSchema().newValidator();
-			jaxbMarshaller.marshal(container, file);
-			//validator.setErrorHandler(errorHandler);
-			//validator.validate(new StreamSource(file));
-		}
-		catch (Exception ex) {
-			System.out.println("File " + file.getName() + " throw an exception \n" + ex.getMessage());
-			//	throw ex;
-		}
-	}
-	
-	public void writeFile(Container container, File file) throws SAXException, JAXBException, IOException {
-		
-		CustomErrorHandler errorHandler = new CustomErrorHandler();
-		
-		try {
-			
-			JAXBContext jaxbContext = JAXBContext.newInstance("org.openmrs.module.nigeriaemr.model.ndr");
-			Marshaller jaxbMarshaller = createMarshaller(jaxbContext);
-			
-			javax.xml.validation.Validator validator = jaxbMarshaller.getSchema().newValidator();
-			jaxbMarshaller.marshal(container, file);
-			validator.setErrorHandler(errorHandler);
-			validator.validate(new StreamSource(file));
-		}
-		catch (Exception ex) {
-			System.out.println("File " + file.getName() + " throw an exception \n" + ex.getMessage());
-			throw ex;
-		}
-	}
-	
+
+    /**
+     * Create PatientDemographicsType for pts Create CommonQuestionType for pts
+     * Create HIVQuestionsType for pts Get all Pharmacy visits for patients For
+     * each Pharmacy visit create RegimenType Get all Clinical visits for
+     * patients // For each Clinical visits create HIVEncounter // Get all Lab
+     * visits for patients // For each of Lab visit create LabReportType
+     */
+    //
+    private ProgramAreaType createProgramArea() {
+        ProgramAreaType p = new ProgramAreaType();
+        p.setProgramAreaCode("HIV");
+        return p;
+    }
+
+    private AddressType createPatientAddress() {
+        AddressType p = new AddressType();
+        p.setAddressTypeCode("H");
+        p.setCountryCode("NGA");
+        Connection connection = null;
+        Statement statement = null;
+
+        PersonAddress pa = patient.getPersonAddress();
+        if (pa != null) {
+            //p.setTown(pa.getAddress1());
+            String lga = pa.getCityVillage();
+            String state = pa.getStateProvince();
+
+            try {
+                String sql = String
+                        .format(
+                                "SELECT `name`, user_generated_id, 'STATE' AS 'Location' "
+                                + "FROM address_hierarchy_entry WHERE level_id =2 AND NAME = '%s' "
+                                + "UNION "
+                                + "SELECT `name`, user_generated_id, 'LGA' AS 'Location' FROM address_hierarchy_entry "
+                                + " WHERE level_id =3 AND NAME ='%s' AND parent_id = (SELECT address_hierarchy_entry_id FROM address_hierarchy_entry\n"
+                                + " WHERE level_id =2 AND NAME = '%s')", state, lga, state);
+
+                connection = DriverManager.getConnection(this.openmrsConn.getUrl(), this.openmrsConn.getUsername(),
+                        this.openmrsConn.getPassword());
+                statement = connection.createStatement();
+                ResultSet result = statement.executeQuery(sql);
+                while (result.next()) {
+                    //String name = result.getString("name");
+                    String coded_value = result.getString("user_generated_id");
+
+                    if (result.getString("Location").contains("STATE")) {
+                        p.setStateCode(coded_value);
+                    } else {
+                        p.setLGACode(coded_value);
+                    }
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                //LoggerUtils.write(NDRMainDictionary.class.getName(), e.getMessage(), LoggerUtils.LogFormat.FATAL,
+                //  LogLevel.live);
+            } finally {
+
+                try {
+                    if (connection != null) {
+                        connection.close();
+                    }
+
+                    if (statement != null) {
+                        statement.close();
+                    }
+
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+
+        }
+        return p;
+    }
+
+    private MessageHeaderType createMessageHeaderType() throws DatatypeConfigurationException {
+        MessageHeaderType header = new MessageHeaderType();
+
+        Calendar cal = Calendar.getInstance();
+
+        header.setMessageCreationDateTime(Utils.getXmlDateTime(cal.getTime()));
+        header.setMessageStatusCode("INITIAL");
+        header.setMessageSchemaVersion(new BigDecimal("1.4"));
+        header.setMessageUniqueID(UUID.randomUUID().toString());
+        return header;
+    }
+
+    public Marshaller createMarshaller(JAXBContext jaxbContext) throws JAXBException, SAXException {
+        Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+
+        SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+
+        java.net.URL xsdFilePath = Thread.currentThread().getContextClassLoader().getResource("NDR 1.4.xsd");
+
+        assert xsdFilePath != null;
+
+        Schema schema = sf.newSchema(xsdFilePath);
+
+        jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        jaxbMarshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+
+        jaxbMarshaller.setSchema(schema);
+
+        //Call Validator class to perform the validation
+        jaxbMarshaller.setEventHandler(new Validator());
+        return jaxbMarshaller;
+    }
+
+    public void writeFile(Container container, File file, Marshaller jaxbMarshaller) throws SAXException, JAXBException,
+            IOException {
+
+        CustomErrorHandler errorHandler = new CustomErrorHandler();
+
+        try {
+            javax.xml.validation.Validator validator = jaxbMarshaller.getSchema().newValidator();
+            jaxbMarshaller.marshal(container, file);
+            //validator.setErrorHandler(errorHandler);
+            //validator.validate(new StreamSource(file));
+        } catch (Exception ex) {
+            System.out.println("File " + file.getName() + " throw an exception \n" + ex.getMessage());
+            //	throw ex;
+        }
+    }
+
+    public void writeFile(Container container, File file) throws SAXException, JAXBException, IOException {
+
+        CustomErrorHandler errorHandler = new CustomErrorHandler();
+
+        try {
+
+            JAXBContext jaxbContext = JAXBContext.newInstance("org.openmrs.module.nigeriaemr.model.ndr");
+            Marshaller jaxbMarshaller = createMarshaller(jaxbContext);
+
+            javax.xml.validation.Validator validator = jaxbMarshaller.getSchema().newValidator();
+            jaxbMarshaller.marshal(container, file);
+            validator.setErrorHandler(errorHandler);
+            validator.validate(new StreamSource(file));
+        } catch (Exception ex) {
+            System.out.println("File " + file.getName() + " throw an exception \n" + ex.getMessage());
+            throw ex;
+        }
+    }
+
 }
