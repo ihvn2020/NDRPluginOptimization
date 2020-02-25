@@ -17,6 +17,8 @@ import java.util.Set;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.XMLGregorianCalendar;
 import org.openmrs.Patient;
+import org.openmrs.PersonAddress;
+import org.openmrs.module.nigeriaemr.model.ndr.AddressType;
 import org.openmrs.module.nigeriaemr.model.ndr.FingerPrintType;
 import org.openmrs.module.nigeriaemr.model.ndr.LeftHandType;
 import org.openmrs.module.nigeriaemr.model.ndr.RightHandType;
@@ -29,18 +31,18 @@ import org.openmrs.module.nigeriaemr.omodmodels.DBConnection;
  * @author The Bright
  */
 public class ObsDAO {
-
+    
     private Connection conn = null;
-
+    
     private PreparedStatement pStatement = null;
-
+    
     private ResultSet resultSet = null;
-
+    
     private void openConnection() throws SQLException {
         DBConnection openmrsConn = Utils.getNmrsConnectionDetails();
         conn = DriverManager.getConnection(openmrsConn.getUrl(), openmrsConn.getUsername(), openmrsConn.getPassword());
     }
-
+    
     public void closeConnection() {
         try {
             if (conn != null) {
@@ -50,21 +52,21 @@ public class ObsDAO {
                 pStatement.close();
             }
         } catch (Exception ex) {
-
+            
         }
     }
-
+    
     public ObsDAO() throws SQLException {
         openConnection();
     }
-
+    
     public CustomObs convertResultSetToCustomObs(ResultSet rs) throws SQLException {
         CustomObs cobs = new CustomObs();
         cobs.setPatientID(rs.getInt("person_id"));
         cobs.setEncounterID(rs.getInt("encounter_id"));
         cobs.setPepfarID(rs.getString("pepfar_id"));
         cobs.setHospID(rs.getString("hosp_id"));
-        cobs.setObsDateTime(rs.getDate("obs_datetime"));
+        cobs.setObsDatetime(rs.getDate("obs_datetime"));
         cobs.setVisitDate(rs.getDate("encounter_datetime"));
         cobs.setFormName(rs.getString("pmm_form"));
         cobs.setFormID(rs.getInt("form_id"));
@@ -134,7 +136,7 @@ public class ObsDAO {
                 + "INNER JOIN concept_name cn1 on(cn1.concept_id=obs.value_coded and cn1.locale='en' and cn1.locale_preferred=1)\n"
                 + "INNER JOIN concept_name cn2 on(cn2.concept_id=obs.concept_id and cn2.locale='en' and cn2.locale_preferred=1)\n"
                 + "WHERE encounter.encounter_type IN ('" + buildString(encounterTypeSet) + "') and encounter.voided=0 and encounter.patient_id='" + patientID + "'";
-
+        
         Statement stmt = null;
         ResultSet rs = null;
         CustomObs obs = null;
@@ -156,9 +158,9 @@ public class ObsDAO {
             cleanUp(rs, stmt);
         }
         return obsList;
-
+        
     }
-
+    
     public StringBuilder buildString(Set<Integer> ids) {
         StringBuilder sbuilder = new StringBuilder();
         for (int ele : ids) {
@@ -169,7 +171,7 @@ public class ObsDAO {
         }
         return sbuilder;
     }
-
+    
     public void cleanUp(ResultSet rs, Statement stmt) {
         try {
             if (rs != null) {
@@ -181,10 +183,11 @@ public class ObsDAO {
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
-
+        
     }
-     public FingerPrintType getPatientsFingerPrint(Patient pts) {
-         int id=pts.getId();
+
+    public FingerPrintType getPatientsFingerPrint(Patient pts) {
+        int id = pts.getId();
         //Connection connection;
         try {
 
@@ -247,7 +250,7 @@ public class ObsDAO {
                     fingerPrintsType.setSource("UNK");
                 }
                 fingerPrintsType.setDateCaptured(dataCaptured);
-
+                
                 fingerPrintsType.setPresent(true);
                 //fingerPrintsType.setLeftHand(leftHand);
                 //fingerPrintsType.setRightHand(rightHand);
@@ -264,9 +267,57 @@ public class ObsDAO {
             //LoggerUtils.write(NDRMainDictionary.class.getName(), e.getMessage(), LogFormat.FATAL, LoggerUtils.LogLevel.live.live);
         } catch (DatatypeConfigurationException e) {
             e.printStackTrace();
-        }finally{
+        } finally {
             cleanUp(resultSet, pStatement);
         }
         return null;
     }
+    
+    public AddressType createPatientAddress(Patient patient) {
+        AddressType p = new AddressType();
+        p.setAddressTypeCode("H");
+        p.setCountryCode("NGA");
+        Connection connection = null;
+        Statement statement = null;
+        
+        PersonAddress pa = patient.getPersonAddress();
+        if (pa != null) {
+            //p.setTown(pa.getAddress1());
+            String lga = pa.getCityVillage();
+            String state = pa.getStateProvince();
+            
+            try {
+                String sql = String
+                        .format(
+                                "SELECT `name`, user_generated_id, 'STATE' AS 'Location' "
+                                + "FROM address_hierarchy_entry WHERE level_id =2 AND NAME = '%s' "
+                                + "UNION "
+                                + "SELECT `name`, user_generated_id, 'LGA' AS 'Location' FROM address_hierarchy_entry "
+                                + " WHERE level_id =3 AND NAME ='%s' AND parent_id = (SELECT address_hierarchy_entry_id FROM address_hierarchy_entry\n"
+                                + " WHERE level_id =2 AND NAME = '%s')", state, lga, state);
+                
+                statement = conn.createStatement();
+                ResultSet result = statement.executeQuery(sql);
+                while (result.next()) {
+                    //String name = result.getString("name");
+                    String coded_value = result.getString("user_generated_id");
+                    
+                    if (result.getString("Location").contains("STATE")) {
+                        p.setStateCode(coded_value);
+                    } else {
+                        p.setLGACode(coded_value);
+                    }
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                //LoggerUtils.write(NDRMainDictionary.class.getName(), e.getMessage(), LoggerUtils.LogFormat.FATAL,
+                //  LogLevel.live);
+            } finally {
+                cleanUp(resultSet, statement);
+            }
+            
+        }
+        return p;
+    }
+    
 }

@@ -532,6 +532,31 @@ public class Utils {
 		
 		return enrollmentDate;
 	}
+	public static Date extractCustomEnrollmentDate(Patient patient, List<CustomObs> allPatientObs,
+	        List<Encounter> allPatientEncounterList) {
+		Date enrollmentDate = null;
+		CustomObs obs = null;
+		PatientProgram patientProgram = null;
+		//ProgramWorkflowService workFlowService = Context.getProgramWorkflowService();
+		//List<PatientProgram> patientProgramList = new ArrayList<PatientProgram>();
+		//patientProgramList.addAll(workFlowService.getPatientPrograms(patient));
+		//patientProgram = extractProgramByID(patientProgramList, HIV_ENROLLMENT_PROGRAM_ID);
+		//if (patientProgram != null) {
+		//enrollmentDate = patientProgram.getDateEnrolled();
+		//} else {
+		obs = extractCustomObs(Utils.DATE_OF_HIV_DIAGNOSIS_CONCEPT, allPatientObs);
+		if (obs != null) {
+			enrollmentDate = obs.getValueDate();
+		} else {
+			Encounter firstEncounter = getFirstEncounter(patient, allPatientEncounterList);
+			if (firstEncounter != null) {
+				enrollmentDate = firstEncounter.getEncounterDatetime();
+			}
+			//}
+		}
+		
+		return enrollmentDate;
+	}
 	
 	public static PatientProgram extractProgramByID(List<PatientProgram> patientProgramList, int programID) {
 		PatientProgram patientProgram = null;
@@ -571,6 +596,21 @@ public class Utils {
         }
         if (!regimenLineObsList.isEmpty()) {
             regimenLineObsList.sort(Comparator.comparing(Obs::getObsDatetime));
+            int size = regimenLineObsList.size();
+            return regimenLineObsList.get(size - 1);
+        }
+        return null;
+    }
+        public static CustomObs getLastCustomObsOfConceptByDate(List<CustomObs> obsList, int conceptID) {
+        Obs obs = null;
+        List<CustomObs> regimenLineObsList = new ArrayList<CustomObs>();
+        for (CustomObs ele : obsList) {
+            if (ele.getConceptID() == conceptID) {
+                regimenLineObsList.add(ele);
+            }
+        }
+        if (!regimenLineObsList.isEmpty()) {
+            regimenLineObsList.sort(Comparator.comparing(CustomObs::getObsDatetime));
             int size = regimenLineObsList.size();
             return regimenLineObsList.get(size - 1);
         }
@@ -692,6 +732,18 @@ public class Utils {
 		if (obsList != null) {
 			for (Obs ele : obsList) {
 				if (ele.getConcept().getConceptId() == conceptID && ele.getValueCoded().getConceptId() == valueCoded) {
+					obs = ele;
+				}
+			}
+		}
+		return obs;
+	}
+        
+        public static CustomObs extractCustomObsByValues(int conceptID, int valueCoded, List<CustomObs> obsList) {
+		CustomObs obs = null;
+		if (obsList != null) {
+			for (CustomObs ele : obsList) {
+				if (ele.getConceptID() == conceptID && ele.getValueCoded() == valueCoded) {
 					obs = ele;
 				}
 			}

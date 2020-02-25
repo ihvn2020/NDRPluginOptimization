@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.openmrs.module.nigeriaemr.ndrfactory;
+package org.openmrs.module.nigeriaemr.ndrfactorycustom;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,6 +47,7 @@ import org.openmrs.module.nigeriaemr.ndrUtils.CustomErrorHandler;
 import org.openmrs.module.nigeriaemr.ndrUtils.LoggerUtils;
 import org.openmrs.module.nigeriaemr.ndrUtils.Utils;
 import org.openmrs.module.nigeriaemr.ndrUtils.Validator;
+import org.openmrs.module.nigeriaemr.ndrfactory.NDRMainDictionary;
 import org.openmrs.module.nigeriaemr.omodmodels.CustomObs;
 import org.openmrs.module.nigeriaemr.omodmodels.DBConnection;
 import org.openmrs.scheduler.tasks.AbstractTask;
@@ -100,7 +101,6 @@ public class NDRCustomConverter extends AbstractTask {
 
     public IndividualReportType createIndividualReportType() {
         IndividualReportType individualReport = new IndividualReportType();
-
         return individualReport;
     }
     
@@ -139,7 +139,7 @@ public class NDRCustomConverter extends AbstractTask {
         /*
             Create AddressType
         */
-        AddressType addressType=createPatientAddress(pts, openmrsConnection);
+        AddressType addressType=obsDAO.createPatientAddress(pts);
         conditionType.setPatientAddress(addressType);
         
         

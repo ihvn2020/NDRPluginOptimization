@@ -16,14 +16,14 @@ public class CustomObs implements Comparable<CustomObs> {
     /**
      * @return the obsDateTime
      */
-    public Date getObsDateTime() {
+    public Date getObsDatetime() {
         return obsDateTime;
     }
 
     /**
      * @param obsDateTime the obsDateTime to set
      */
-    public void setObsDateTime(Date obsDateTime) {
+    public void setObsDatetime(Date obsDateTime) {
         this.obsDateTime = obsDateTime;
     }
 

@@ -197,6 +197,12 @@ public class NDRMainDictionary {
         commonQuestionsType = commonQuestionDictionary.createCommonQuestionType(patient, allPatientEncounterList, allPatientObsList);
         return commonQuestionsType;
     }
+    
+    public CommonQuestionsType createCustomCommonQuestionType2(Patient patient, List<Encounter> allPatientEncounterList, List<Obs> allPatientObsList) throws DatatypeConfigurationException {
+        CommonQuestionsType commonQuestionsType = null;
+        commonQuestionsType = commonQuestionDictionary.createCommonQuestionType(patient, allPatientEncounterList, allPatientObsList);
+        return commonQuestionsType;
+    }
 
     public ConditionSpecificQuestionsType createCommConditionSpecificQuestionsType(Patient patient, List<Encounter> allPatientEncounterList, List<Obs> allPatientObsList) throws DatatypeConfigurationException {
         return commonQuestionDictionary.createConditionSpecificQuestionType(patient, allPatientEncounterList, allPatientObsList);

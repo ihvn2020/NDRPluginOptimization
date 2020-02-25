@@ -453,7 +453,7 @@ public class NDRCommonQuestionsDictionary {
                         obs = Utils.extractCustomObs(Utils.DATE_OF_TERMINATION_CONCEPT, obsListForEncounterTypes);
                         //set date
                         if (obs != null) {
-                            demo.setPatientDeceasedDate(getXmlDate(obs.getObsDateTime()));
+                            demo.setPatientDeceasedDate(getXmlDate(obs.getObsDatetime()));
                         }
                     } else {
                         demo.setPatientDeceasedIndicator(false);
@@ -591,7 +591,93 @@ public class NDRCommonQuestionsDictionary {
         }
         return null;
     }
+    
+    public CommonQuestionsType createCustomCommonQuestionType(Patient pts, List<Encounter> encounters, List<CustomObs> allObs) throws DatatypeConfigurationException {
+        CustomObs obs = null;
+        Date valueDateTime = null;
+        int valueCoded = 0;
+        String ndrCode = "";
+        Boolean ndrBooleanCode = null;
+        CommonQuestionsType common=null;
+        try {
+            PatientIdentifier pepfarIdentifier = pts.getPatientIdentifier(Utils.PEPFAR_IDENTIFIER_INDEX);
 
+             common= new CommonQuestionsType();
+            //List<Obs> hivEnrollmentObs = Utils.FilterObsByEncounterTypeId(allObs, Utils.HIV_Enrollment_Encounter_Type_Id); // Utils.getHIVEnrollmentObs(pts);
+
+            if (pepfarIdentifier != null) {
+
+                try {
+                    common.setHospitalNumber(pts.getPatientIdentifier(Utils.HOSPITAL_IDENTIFIER_INDEX).getIdentifier());
+                } catch (Exception e) {
+                    common.setHospitalNumber(pts.getPatientIdentifier(Utils.PEPFAR_IDENTIFIER_INDEX).getIdentifier());
+                }
+                /*  Assuming Hospital No is 3*/
+                //old code commented for throwing error change by the try and catch code abowe
+                //common.setHospitalNumber(pts.getPatientIdentifier(3).getIdentifier());
+            }
+
+            try {
+                Encounter lastEncounterDate = Utils.getLastEncounter(encounters); //(pts);
+                if (lastEncounterDate != null) {
+                    common.setDateOfLastReport(getXmlDate(lastEncounterDate.getEncounterDatetime()));
+                }
+
+                Date EnrollmentDate = Utils.extractCustomEnrollmentDate(pts, allObs, encounters);
+                if (EnrollmentDate != null) {
+                    common.setDateOfFirstReport(getXmlDate(EnrollmentDate));
+                    common.setDiagnosisDate(getXmlDate(EnrollmentDate));
+                }
+                obs = Utils.extractCustomObs(Utils.DATE_OF_HIV_DIAGNOSIS_CONCEPT, allObs);
+                if (obs != null) {
+                    valueDateTime = obs.getValueDate();
+                    common.setDiagnosisDate(getXmlDate(valueDateTime));
+                }
+            } catch (Exception ex) {
+
+            }
+
+            if (pts.getGender().equalsIgnoreCase("F")) {
+
+                //set estimated delivery date concept id
+                //obs = Utils.extractObs(Estimated_Delivery_Date_Concept_Id, hivEnrollmentObs);
+                obs = Utils.getLastCustomObsOfConceptByDate(allObs, Utils.PREGNANCY_BREASTFEEDING_STATUS);
+                if (obs != null ){
+                    int val=obs.getValueCoded();
+                    //ndrBooleanCode = obs.getValueBoolean();
+                    if (val==1) {
+                        common.setPatientPregnancyStatusCode("P");
+                    } else if (val==0) {
+                        common.setPatientPregnancyStatusCode("NP");
+                    }
+
+                }
+
+            }
+
+            common.setPatientAge(pts.getAge());
+
+            //set Patient Die From This Illness tag
+            obs = Utils.extractCustomObsByValues(Utils.REASON_FOR_TERMINATION_CONCEPT, Utils.DEAD_CONCEPT, allObs);
+            if (obs != null) {
+                common.setPatientDieFromThisIllness(Boolean.TRUE);
+            } else {
+                common.setPatientDieFromThisIllness(Boolean.FALSE);
+            }
+            //LoggerUtils.write(NDRMainDictionary.class.getName(), "About to pull Patient_Died_From_Illness_Concept_Id", LoggerUtils.LogFormat.FATAL, LoggerUtils.LogLevel.debug);
+            //if (obs != null && obs.getValueCoded().getConceptId() == Patient_Died_From_Illness_Value_Concept_Id) {
+            // common.setPatientDieFromThisIllness(true);
+            //}
+            //LoggerUtils.write(NDRMainDictionary.class.getName(), "Finished pulling Patient_Died_From_Illness_Concept_Id", LoggerUtils.LogFormat.FATAL, LoggerUtils.LogLevel.debug);
+        } catch (Exception ex) {
+            //LoggerUtils.write(NDRMainDictionary.class.getName(), ex.getMessage(), LoggerUtils.LogFormat.FATAL, LoggerUtils.LogLevel.live);
+            //throw new DatatypeConfigurationException(ex.getMessage());
+        }
+        return common;
+    }
+
+    
+    
     public CommonQuestionsType createCommonQuestionType(Patient pts, List<Encounter> encounters, List<Obs> allObs) throws DatatypeConfigurationException {
         Obs obs = null;
         Date valueDateTime = null;
