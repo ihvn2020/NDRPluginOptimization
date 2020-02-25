@@ -22,10 +22,14 @@ import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openmrs.module.nigeriaemr.ndrUtils.LoggerUtils;
 import org.openmrs.module.nigeriaemr.ndrUtils.LoggerUtils.LogFormat;
 import org.openmrs.module.nigeriaemr.ndrUtils.LoggerUtils.LogLevel;
@@ -37,7 +41,9 @@ import org.openmrs.module.nigeriaemr.service.FacilityLocationService;
 import org.springframework.web.bind.annotation.RequestParam;
 
 public class NdrFragmentController {
-	
+	protected final Log log = LogFactory.getLog(getClass());
+	// holds progress information of current dump thread
+	private static Map<String,String> progressInfo = new HashMap<String,String>();
 	public void controller() {
 		
 	}
@@ -318,7 +324,7 @@ public class NdrFragmentController {
 
         return locationString;
     }
-	
+      
 	public String getPatientLocationAggregate() {
 		ObjectMapper mapper = new ObjectMapper();
 		FacilityLocationService facilityLocationService = new FacilityLocationService();
@@ -332,5 +338,18 @@ public class NdrFragmentController {
 		}
 		
 		return responseString;
+	}
+        /**
+	 * @return the progressInfo
+	 */
+	public static Map<String,String> getProgressInfo() {
+		return progressInfo;
+	}
+	
+	/**
+	 * @param progressInfo the progressInfo to set
+	 */
+	public static void setProgressInfo(Map<String,String> progressInfo) {
+		NdrFragmentController.progressInfo = progressInfo;
 	}
 }

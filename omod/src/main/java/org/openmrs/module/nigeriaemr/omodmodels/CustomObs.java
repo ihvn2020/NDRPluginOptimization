@@ -14,6 +14,20 @@ import java.util.Date;
 public class CustomObs implements Comparable<CustomObs> {
 
     /**
+     * @return the obsDateTime
+     */
+    public Date getObsDateTime() {
+        return obsDateTime;
+    }
+
+    /**
+     * @param obsDateTime the obsDateTime to set
+     */
+    public void setObsDateTime(Date obsDateTime) {
+        this.obsDateTime = obsDateTime;
+    }
+
+    /**
      * @return the encounterTypeID
      */
     public int getEncounterTypeID() {
@@ -450,6 +464,7 @@ public class CustomObs implements Comparable<CustomObs> {
     private int patientID;
     private int encounterID;
     private int encounterTypeID;
+    private Date obsDateTime;
     private String pepfarID;
     private String hospID;
     private Date visitDate;

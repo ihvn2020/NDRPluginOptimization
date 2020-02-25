@@ -22,6 +22,7 @@ import org.openmrs.module.nigeriaemr.ndrUtils.ConstantsUtil;
 import org.openmrs.module.nigeriaemr.ndrUtils.LoggerUtils.LogLevel;
 
 import static org.openmrs.module.nigeriaemr.ndrUtils.Utils.getXmlDate;
+import org.openmrs.module.nigeriaemr.omodmodels.CustomObs;
 import org.openmrs.module.nigeriaemr.omodmodels.DBConnection;
 
 //on master
@@ -186,6 +187,9 @@ public class NDRMainDictionary {
 	}*/
     public PatientDemographicsType createPatientDemographicType2(Patient patient, FacilityType facility, DBConnection openmrsConn, List<Encounter> allPatientEncounterList, List<Obs> allPatientObsList) throws DatatypeConfigurationException {
         return commonQuestionDictionary.createPatientDemographicsType(patient, facility, allPatientObsList, allPatientEncounterList, openmrsConn);
+    }
+    public PatientDemographicsType createCustomPatientDemographicType2(Patient patient, FacilityType facility,  List<CustomObs> allPatientObsList) throws DatatypeConfigurationException {
+        return commonQuestionDictionary.createCustomPatientDemographicsType(patient, facility, allPatientObsList);
     }
 
     public CommonQuestionsType createCommonQuestionType2(Patient patient, List<Encounter> allPatientEncounterList, List<Obs> allPatientObsList) throws DatatypeConfigurationException {

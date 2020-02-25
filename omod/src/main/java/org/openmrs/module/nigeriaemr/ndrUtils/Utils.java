@@ -40,6 +40,7 @@ import org.joda.time.Months;
 import org.openmrs.api.ProgramWorkflowService;
 import org.openmrs.module.nigeriaemr.ndrUtils.LoggerUtils.LogFormat;
 import org.openmrs.module.nigeriaemr.ndrUtils.LoggerUtils.LogLevel;
+import org.openmrs.module.nigeriaemr.omodmodels.CustomObs;
 import org.openmrs.module.nigeriaemr.omodmodels.DBConnection;
 import org.openmrs.module.nigeriaemr.omodmodels.Version;
 import org.openmrs.util.OpenmrsUtil;
@@ -603,6 +604,17 @@ public class Utils {
 		}
 		return enrollmentObsList;
 	}
+        public static List<CustomObs> extractCustomObsListForEncounterType(List<CustomObs> allPatientObsList, Integer[] encounterTypeArr) {
+		List<CustomObs> enrollmentObsList = new ArrayList<CustomObs>();
+		List<Integer> encounterTypeList = new ArrayList<Integer>();
+		encounterTypeList.addAll(Arrays.asList(encounterTypeArr));
+		for (CustomObs ele : allPatientObsList) {
+			if (encounterTypeList.contains(ele.getEncounterTypeID())) {
+				enrollmentObsList.add(ele);
+			}
+		}
+		return enrollmentObsList;
+	}
 	
 	public static Obs extractPregnancyStatusObs(Patient patient, List<Obs> allObsList) {
 		Obs pregnancyObs = null;
@@ -648,6 +660,13 @@ public class Utils {
             return null;
         }
         return obsList.stream().filter(ele -> ele.getConcept().getConceptId() == conceptID).findFirst().orElse(null);
+    }
+        public static CustomObs extractCustomObs(int conceptID, List<CustomObs> obsList) {
+
+        if (obsList == null) {
+            return null;
+        }
+        return obsList.stream().filter(ele -> ele.getConceptID() == conceptID).findFirst().orElse(null);
     }
 	
 	public static List<Obs> extractObsList(int conceptID, List<Obs> obsList) {

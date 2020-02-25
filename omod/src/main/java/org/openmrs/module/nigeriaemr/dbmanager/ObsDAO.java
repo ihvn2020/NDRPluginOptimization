@@ -6,6 +6,7 @@
 package org.openmrs.module.nigeriaemr.dbmanager;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -13,7 +14,15 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.XMLGregorianCalendar;
+import org.openmrs.Patient;
+import org.openmrs.module.nigeriaemr.model.ndr.FingerPrintType;
+import org.openmrs.module.nigeriaemr.model.ndr.LeftHandType;
+import org.openmrs.module.nigeriaemr.model.ndr.RightHandType;
+import org.openmrs.module.nigeriaemr.ndrUtils.Utils;
 import org.openmrs.module.nigeriaemr.omodmodels.CustomObs;
+import org.openmrs.module.nigeriaemr.omodmodels.DBConnection;
 
 /**
  *
@@ -26,6 +35,11 @@ public class ObsDAO {
     private PreparedStatement pStatement = null;
 
     private ResultSet resultSet = null;
+
+    private void openConnection() throws SQLException {
+        DBConnection openmrsConn = Utils.getNmrsConnectionDetails();
+        conn = DriverManager.getConnection(openmrsConn.getUrl(), openmrsConn.getUsername(), openmrsConn.getPassword());
+    }
 
     public void closeConnection() {
         try {
@@ -40,8 +54,8 @@ public class ObsDAO {
         }
     }
 
-    public ObsDAO(Connection openmrsConnection) {
-        this.conn = openmrsConnection;
+    public ObsDAO() throws SQLException {
+        openConnection();
     }
 
     public CustomObs convertResultSetToCustomObs(ResultSet rs) throws SQLException {
@@ -50,6 +64,7 @@ public class ObsDAO {
         cobs.setEncounterID(rs.getInt("encounter_id"));
         cobs.setPepfarID(rs.getString("pepfar_id"));
         cobs.setHospID(rs.getString("hosp_id"));
+        cobs.setObsDateTime(rs.getDate("obs_datetime"));
         cobs.setVisitDate(rs.getDate("encounter_datetime"));
         cobs.setFormName(rs.getString("pmm_form"));
         cobs.setFormID(rs.getInt("form_id"));
@@ -77,7 +92,7 @@ public class ObsDAO {
         cobs.setVoidedBy(rs.getInt("voided_by"));
         return cobs;
     }
-
+    
     public List<CustomObs> getObsForPatient(int patientID, Set<Integer> encounterTypeSet) {
         List<CustomObs> obsList = new ArrayList<>();
         String sql_text = "SELECT\n"
@@ -118,8 +133,8 @@ public class ObsDAO {
                 + "INNER JOIN form on(form.form_id=encounter.form_id and encounter.voided=0)\n"
                 + "INNER JOIN concept_name cn1 on(cn1.concept_id=obs.value_coded and cn1.locale='en' and cn1.locale_preferred=1)\n"
                 + "INNER JOIN concept_name cn2 on(cn2.concept_id=obs.concept_id and cn2.locale='en' and cn2.locale_preferred=1)\n"
-                + "WHERE encounter.encounter_type IN ('"+buildString(encounterTypeSet)+"') and encounter.voided=0 and encounter.patient_id='"+patientID+"'";
-        
+                + "WHERE encounter.encounter_type IN ('" + buildString(encounterTypeSet) + "') and encounter.voided=0 and encounter.patient_id='" + patientID + "'";
+
         Statement stmt = null;
         ResultSet rs = null;
         CustomObs obs = null;
@@ -128,7 +143,7 @@ public class ObsDAO {
                     java.sql.ResultSet.CONCUR_READ_ONLY);
             stmt.setFetchSize(Integer.MIN_VALUE);
             rs = stmt.executeQuery(sql_text);
-            while(rs.next()) {
+            while (rs.next()) {
                 obs = convertResultSetToCustomObs(rs);
                 obsList.add(obs);
             }
@@ -141,7 +156,7 @@ public class ObsDAO {
             cleanUp(rs, stmt);
         }
         return obsList;
-        
+
     }
 
     public StringBuilder buildString(Set<Integer> ids) {
@@ -154,6 +169,7 @@ public class ObsDAO {
         }
         return sbuilder;
     }
+
     public void cleanUp(ResultSet rs, Statement stmt) {
         try {
             if (rs != null) {
@@ -166,5 +182,91 @@ public class ObsDAO {
             ex.printStackTrace();
         }
 
+    }
+     public FingerPrintType getPatientsFingerPrint(Patient pts) {
+         int id=pts.getId();
+        //Connection connection;
+        try {
+
+            //  DBConnection connResult = Utils.getNmrsConnectionDetails();
+            //connection = DriverManager.getConnection(connResult.getUrl(), connResult.getUsername(), connResult.getPassword());
+            Statement statement = conn.createStatement();
+            String sqlStatement = ("SELECT template, fingerPosition, date_created,creator FROM biometricinfo WHERE patient_Id = " + id);
+            ResultSet result = statement.executeQuery(sqlStatement);
+            FingerPrintType fingerPrintsType = new FingerPrintType();
+            if (result.next()) {
+                RightHandType rightFingerType = new RightHandType();
+                LeftHandType leftFingerType = new LeftHandType();
+                XMLGregorianCalendar dataCaptured = null;
+                Integer creator = null;
+                while (result.next()) {
+                    String fingerPosition = result.getString("fingerPosition");
+                    creator = result.getInt("creator");
+                    dataCaptured = Utils.getXmlDateTime(result.getDate("date_created"));
+                    switch (fingerPosition) {
+                        case "RightThumb":
+                            rightFingerType.setRightThumb(result.getString("template"));
+                            break;
+                        case "RightIndex":
+                            rightFingerType.setRightIndex(result.getString("template"));
+                            break;
+                        case "RightMiddle":
+                            rightFingerType.setRightMiddle(result.getString("template"));
+                            break;
+                        case "RightWedding":
+                            rightFingerType.setRightWedding(result.getString("template"));
+                            break;
+                        case "RightSmall":
+                            rightFingerType.setRightSmall(result.getString("template"));
+                            break;
+                        case "LeftThumb":
+                            leftFingerType.setLeftThumb(result.getString("template"));
+                            break;
+                        case "LeftIndex":
+                            leftFingerType.setLeftIndex(result.getString("template"));
+                            break;
+                        case "LeftMiddle":
+                            leftFingerType.setLeftMiddle(result.getString("template"));
+                            break;
+                        case "LeftWedding":
+                            leftFingerType.setLeftWedding(result.getString("template"));
+                            break;
+                        case "LeftSmall":
+                            leftFingerType.setLeftSmall(result.getString("template"));
+                            break;
+                    }
+                }
+                /*do{
+
+                } while(result.next());*/
+                if (creator == 0) {
+                    fingerPrintsType.setSource("N");
+                } else if (creator == 1) {
+                    fingerPrintsType.setSource("M");
+                } else {
+                    fingerPrintsType.setSource("UNK");
+                }
+                fingerPrintsType.setDateCaptured(dataCaptured);
+
+                fingerPrintsType.setPresent(true);
+                //fingerPrintsType.setLeftHand(leftHand);
+                //fingerPrintsType.setRightHand(rightHand);
+                fingerPrintsType.setRightHand(rightFingerType);
+                fingerPrintsType.setLeftHand(leftFingerType);
+            } else {
+                //connection.close();
+                return null;
+            }
+            //connection.close();
+            return fingerPrintsType;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            //LoggerUtils.write(NDRMainDictionary.class.getName(), e.getMessage(), LogFormat.FATAL, LoggerUtils.LogLevel.live.live);
+        } catch (DatatypeConfigurationException e) {
+            e.printStackTrace();
+        }finally{
+            cleanUp(resultSet, pStatement);
+        }
+        return null;
     }
 }

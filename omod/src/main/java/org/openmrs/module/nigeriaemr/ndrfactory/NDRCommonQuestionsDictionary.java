@@ -38,6 +38,7 @@ import org.openmrs.module.nigeriaemr.ndrUtils.LoggerUtils;
 import org.openmrs.module.nigeriaemr.ndrUtils.LoggerUtils.LogFormat;
 import org.openmrs.module.nigeriaemr.ndrUtils.Utils;
 import static org.openmrs.module.nigeriaemr.ndrUtils.Utils.getXmlDate;
+import org.openmrs.module.nigeriaemr.omodmodels.CustomObs;
 import org.openmrs.module.nigeriaemr.omodmodels.DBConnection;
 
 /**
@@ -317,6 +318,188 @@ public class NDRCommonQuestionsDictionary {
          return demo;
 
     }
+    public PatientDemographicsType createCustomPatientDemographicsType(Patient pts, FacilityType facility, List<CustomObs> allObsListForPatient) throws DatatypeConfigurationException {
+        /*
+            PatientDemographicsType
+              -PatientIdentifier
+               -TreatmentFacility
+  -OtherPatientIdentifiers
+  -PatientDateOfBirth
+  -PatientSexCode
+  -PatientDeceasedIndicator
+  -PatientDeceasedDate
+  -PatientPrimaryLanguageCode
+  -PatientEducationLevelCode
+  -PatientOccupationCode
+  -PatientMaritalStatusCode
+  -StateOfNigeriaOriginCode
+  -PatientNotes (NoteType)
+  -FingerPrints
+  -EnrolleeCode
+  -TelephoneType
+  -Extension
+  -EmailAddress
+  -TelephoneTypeCode
+  
+         */
+        PatientDemographicsType demo = new PatientDemographicsType();
+        try {
+
+            //Identifier 4 is Pepfar ID
+            PatientIdentifier pepfarid, pidHospital, pidOthers, htsId, ancId, exposedInfantId, pepId;
+
+            //use combination of rdatimcode and hospital for peffar on surge rivers.
+            pepfarid = new PatientIdentifier();
+            // pepfarid.setIdentifier(String.valueOf(pts.getPatientIdentifier(4)));
+
+            pidHospital = pts.getPatientIdentifier(Utils.HOSPITAL_IDENTIFIER_INDEX);
+            pidOthers = pts.getPatientIdentifier(Utils.OTHER_IDENTIFIER_INDEX);
+            htsId = pts.getPatientIdentifier(Utils.HTS_IDENTIFIER_INDEX);
+            ancId = pts.getPatientIdentifier(Utils.PMTCT_IDENTIFIER_INDEX);
+            exposedInfantId = pts.getPatientIdentifier(Utils.EXPOSE_INFANT_IDENTIFIER_INDEX);
+            pepId = pts.getPatientIdentifier(Utils.PEP_IDENTIFIER_INDEX);
+            pepfarid = pts.getPatientIdentifier(Utils.PEPFAR_IDENTIFIER_INDEX);
+
+            IdentifierType idt;
+            IdentifiersType identifiersType = new IdentifiersType();
+            // Use PepfarID as preferred ID if it exist, else use other IDs
+            if (pepfarid != null) {
+                idt = new IdentifierType();
+                idt.setIDNumber(pepfarid.getIdentifier());
+                demo.setPatientIdentifier(pepfarid.getIdentifier());
+            } else {
+                // demo.setPatientIdentifier(facility.getFacilityID() + "_" + pts.getPatientIdentifier(Utils.OTHER_IDENTIFIER_INDEX).getIdentifier() + "_" + pts.getId());
+            }
+            if (pidHospital != null) {
+                idt = new IdentifierType();
+                idt.setIDNumber(pidHospital.getIdentifier());
+                idt.setIDTypeCode("PI");
+                identifiersType.getIdentifier().add(idt);
+            }
+            if (pidOthers != null) {
+                idt = new IdentifierType();
+                idt.setIDNumber(pidOthers.getIdentifier());
+                idt.setIDTypeCode("PE");
+                identifiersType.getIdentifier().add(idt);
+            }
+            if (htsId != null) {
+                idt = new IdentifierType();
+                idt.setIDNumber(htsId.getIdentifier());
+                idt.setIDTypeCode("HTS");
+                identifiersType.getIdentifier().add(idt);
+            }
+            if (ancId != null) {
+                idt = new IdentifierType();
+                idt.setIDNumber(ancId.getIdentifier());
+                idt.setIDTypeCode("ANC");
+                identifiersType.getIdentifier().add(idt);
+            }
+            if (exposedInfantId != null) {
+                idt = new IdentifierType();
+                idt.setIDNumber(exposedInfantId.getIdentifier());
+                idt.setIDTypeCode("EI");
+                identifiersType.getIdentifier().add(idt);
+            }
+            if (pepId != null) {
+                idt = new IdentifierType();
+                idt.setIDNumber(pepId.getIdentifier());
+                idt.setIDTypeCode("PEP");
+                identifiersType.getIdentifier().add(idt);
+            }
+
+            demo.setOtherPatientIdentifiers(identifiersType);
+            demo.setTreatmentFacility(facility);
+
+            String gender = pts.getGender();
+            if (gender.equals("M") || gender.equalsIgnoreCase("Male")) {
+                demo.setPatientSexCode("M");
+            } else if (gender.equals("F") || gender.equalsIgnoreCase("Female")) {
+                demo.setPatientSexCode("F");
+            }
+            demo.setPatientDateOfBirth(getXmlDate(pts.getBirthdate()));
+
+            /*
+             * Edited By Johnbosco
+             * */
+            //check Finger Print if available
+            //demo.setFingerPrints(getPatientsFingerPrint(pts.getPatientId(), openmrsConn));
+
+            //collect data for SURGE
+            if (Utils.isSurgeSite() == "true") {
+                demo.setFamilyName(pts.getFamilyName());
+                demo.setFirstName(pts.getGivenName());
+                demo.setOtherName(pts.getMiddleName());
+                demo.setPhoneNumber(pts.getPerson().getAttribute(8).getValue());
+            }
+
+            try {
+                String testCode = pts.getFamilyName() + " " + pts.getGivenName() + "" + pts.getMiddleName();
+                Soundex soundex = new Soundex();
+                demo.setEnrolleeCode(soundex.encode(testCode));
+            } catch (Exception ex) {
+                //
+            }
+
+            String ndrCodedValue;
+            Integer[] formEncounterTypeTargets = {Utils.ADULT_INITIAL_ENCOUNTER_TYPE, Utils.PED_INITIAL_ENCOUNTER_TYPE, Utils.INITIAL_ENCOUNTER_TYPE, Utils.HIV_Enrollment_Encounter_Type_Id, Utils.Client_Tracking_And_Termination_Encounter_Type_Id};
+            List<CustomObs> obsListForEncounterTypes = Utils.extractCustomObsListForEncounterType(allObsListForPatient, formEncounterTypeTargets);
+            CustomObs obs = null;
+            if (obsListForEncounterTypes != null && !obsListForEncounterTypes.isEmpty()) {
+                //check for disease indicator
+                obs = Utils.extractCustomObs(Utils.REASON_FOR_TERMINATION_CONCEPT, obsListForEncounterTypes);
+                if (obs != null && obs.getValueCoded() != 0) {
+                    if (obs.getValueCoded() == Utils.DEAD_CONCEPT) {
+                        demo.setPatientDeceasedIndicator(true);
+                        obs = Utils.extractCustomObs(Utils.DATE_OF_TERMINATION_CONCEPT, obsListForEncounterTypes);
+                        //set date
+                        if (obs != null) {
+                            demo.setPatientDeceasedDate(getXmlDate(obs.getObsDateTime()));
+                        }
+                    } else {
+                        demo.setPatientDeceasedIndicator(false);
+                    }
+                }
+                //check Educational level
+                obs = Utils.extractCustomObs(Utils.EDUCATIONAL_LEVEL_CONCEPT, obsListForEncounterTypes);
+                if (obs != null && obs.getValueCoded() != 0) {
+                    ndrCodedValue = getMappedValue(obs.getValueCoded());
+                    if (ndrCodedValue.equals("N")) {
+                        demo.setPatientEducationLevelCode("1");
+                    } else {
+                        demo.setPatientEducationLevelCode(ndrCodedValue);
+                    }
+
+                }
+                //check primary Concept Id
+                //obs = Utils.extractObs(Utils.PRIMARY_LANGUAGE_CONCEPT, obsListForEncounterTypes);
+                //if (obs != null) {
+                //ndrCodedValue = getMappedValue(obs.getValueCoded().getConceptId());
+                //demo.setPatientPrimaryLanguageCode(ndrCodedValue);
+                // }
+                //check Occupational Code
+                obs = Utils.extractCustomObs(Utils.OCCUPATIONAL_STATUS_CONCEPT, obsListForEncounterTypes);
+                if (obs != null && obs.getValueCoded() !=0) {
+                    ndrCodedValue = getMappedValue(obs.getValueCoded());
+                    demo.setPatientOccupationCode(ndrCodedValue);
+                }
+                //check Marital Status Code
+                obs = Utils.extractCustomObs(Utils.MARITAL_STATUS_CONCEPT, obsListForEncounterTypes);
+                if (obs != null) {
+                    ndrCodedValue = getMappedValue(obs.getValueCoded());
+                    demo.setPatientMaritalStatusCode(ndrCodedValue);
+                }
+            }
+
+            return demo;
+        } catch (Exception ex) {
+            //LoggerUtils.write(NDRMainDictionary.class.getName(), ex.getMessage(), LoggerUtils.LogFormat.FATAL, LoggerUtils.LogLevel.live);
+            //throw new DatatypeConfigurationException(Arrays.toString(ex.getStackTrace()));
+        }
+        
+         return demo;
+
+    }
+
 
     private String getMappedValue(int conceptID) {
         if (map.containsKey(conceptID)) {
