@@ -5,16 +5,16 @@
  */
 package org.openmrs.module.nigeriaemr.service;
 
+import org.openmrs.module.nigeriaemr.dbmanager.NdrDBManager;
+import org.openmrs.module.nigeriaemr.omodmodels.FacilityLocation;
+import org.openmrs.module.nigeriaemr.omodmodels.PatientLocation;
+import org.openmrs.module.nigeriaemr.omodmodels.PatientLocationAggregate;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.openmrs.Location;
-import org.openmrs.module.nigeriaemr.dbmanager.NdrDBManager;
-import org.openmrs.module.nigeriaemr.omodmodels.FacilityLocation;
-import org.openmrs.module.nigeriaemr.omodmodels.PatientLocation;
-import org.openmrs.module.nigeriaemr.omodmodels.PatientLocationAggregate;
 
 /**
  * @author MORRISON.I

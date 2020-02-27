@@ -9,9 +9,7 @@
  */
 package org.openmrs.module.nigeriaemr.web.controller;
 
-import org.openmrs.module.nigeriaemr.ndrUtils.Utils;
 import org.openmrs.ui.framework.page.PageModel;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 public class BiometricFormController {
 	

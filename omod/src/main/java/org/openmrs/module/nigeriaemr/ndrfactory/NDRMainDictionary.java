@@ -1,29 +1,15 @@
 package org.openmrs.module.nigeriaemr.ndrfactory;
 
-import com.mchange.v2.encounter.EncounterCounter;
 import org.openmrs.Encounter;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
-import org.openmrs.PatientIdentifier;
 import org.openmrs.module.nigeriaemr.model.ndr.*;
-import org.openmrs.module.nigeriaemr.ndrUtils.LoggerUtils;
-import org.openmrs.module.nigeriaemr.ndrUtils.LoggerUtils.LogFormat;
 import org.openmrs.module.nigeriaemr.ndrUtils.Utils;
-import org.openmrs.util.OpenmrsUtil;
-
-import javax.xml.datatype.DatatypeConfigurationException;
-import java.io.*;
-import java.nio.file.Paths;
-import java.sql.*;
-import java.util.Date;
-import java.util.*;
-import org.apache.commons.codec.language.Soundex;
-import org.openmrs.module.nigeriaemr.ndrUtils.ConstantsUtil;
-import org.openmrs.module.nigeriaemr.ndrUtils.LoggerUtils.LogLevel;
-
-import static org.openmrs.module.nigeriaemr.ndrUtils.Utils.getXmlDate;
 import org.openmrs.module.nigeriaemr.omodmodels.CustomObs;
 import org.openmrs.module.nigeriaemr.omodmodels.DBConnection;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import java.util.*;
 
 //on master
 public class NDRMainDictionary {

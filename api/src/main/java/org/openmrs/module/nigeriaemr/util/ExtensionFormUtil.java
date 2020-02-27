@@ -9,12 +9,6 @@
  */
 package org.openmrs.module.nigeriaemr.util;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Form;
@@ -26,6 +20,8 @@ import org.openmrs.module.htmlformentry.HtmlFormEntryUtil;
 import org.openmrs.ui.framework.resource.ResourceFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+
+import java.util.*;
 
 /**
  * Equivalent of HtmlFormUtil for ExtensionForm objects.

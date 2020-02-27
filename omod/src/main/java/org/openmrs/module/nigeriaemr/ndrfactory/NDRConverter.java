@@ -1,12 +1,15 @@
 package org.openmrs.module.nigeriaemr.ndrfactory;
 
-import java.io.File;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.sql.*;
-import java.util.*;
-import java.util.Date;
-import java.util.stream.Collectors;
+import org.openmrs.*;
+import org.openmrs.api.context.Context;
+import org.openmrs.module.nigeriaemr.model.ndr.*;
+import org.openmrs.module.nigeriaemr.ndrUtils.ConstantsUtil;
+import org.openmrs.module.nigeriaemr.ndrUtils.CustomErrorHandler;
+import org.openmrs.module.nigeriaemr.ndrUtils.Utils;
+import org.openmrs.module.nigeriaemr.ndrUtils.Validator;
+import org.openmrs.module.nigeriaemr.omodmodels.DBConnection;
+import org.xml.sax.SAXException;
+
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -15,17 +18,13 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
-
-import org.openmrs.*;
-import org.openmrs.api.context.Context;
-import org.openmrs.module.nigeriaemr.model.ndr.*;
-import org.openmrs.module.nigeriaemr.ndrUtils.ConstantsUtil;
-import org.openmrs.module.nigeriaemr.ndrUtils.Utils;
-import org.openmrs.module.nigeriaemr.ndrUtils.Validator;
-import org.openmrs.module.nigeriaemr.ndrUtils.CustomErrorHandler;
-import org.xml.sax.SAXException;
-
-import org.openmrs.module.nigeriaemr.omodmodels.DBConnection;
+import java.io.File;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.sql.*;
+import java.util.*;
+import java.util.Date;
+import java.util.stream.Collectors;
 
 public class NDRConverter {
 

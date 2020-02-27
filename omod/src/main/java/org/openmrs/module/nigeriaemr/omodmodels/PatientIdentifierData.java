@@ -5,8 +5,6 @@
  */
 package org.openmrs.module.nigeriaemr.omodmodels;
 
-import org.apache.xpath.operations.Bool;
-
 import java.io.Serializable;
 
 /**

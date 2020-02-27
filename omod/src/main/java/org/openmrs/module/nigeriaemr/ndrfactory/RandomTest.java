@@ -5,12 +5,13 @@
  */
 package org.openmrs.module.nigeriaemr.ndrfactory;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 import org.joda.time.DateTime;
 import org.openmrs.Obs;
 import org.openmrs.module.nigeriaemr.ndrUtils.Utils;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * @author MORRISON.I

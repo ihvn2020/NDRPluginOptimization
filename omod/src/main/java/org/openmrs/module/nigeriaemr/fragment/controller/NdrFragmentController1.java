@@ -6,9 +6,19 @@ import org.openmrs.Patient;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.nigeriaemr.model.ndr.Container;
 import org.openmrs.module.nigeriaemr.model.ndr.FacilityType;
+import org.openmrs.module.nigeriaemr.ndrUtils.LoggerUtils;
+import org.openmrs.module.nigeriaemr.ndrUtils.LoggerUtils.LogFormat;
+import org.openmrs.module.nigeriaemr.ndrUtils.LoggerUtils.LogLevel;
 import org.openmrs.module.nigeriaemr.ndrUtils.Utils;
 import org.openmrs.module.nigeriaemr.ndrfactory.NDRConverter;
+import org.openmrs.module.nigeriaemr.omodmodels.DBConnection;
+import org.openmrs.module.nigeriaemr.omodmodels.FacilityLocation;
+import org.openmrs.module.nigeriaemr.omodmodels.LocationModel;
+import org.openmrs.module.nigeriaemr.omodmodels.PatientLocation;
+import org.openmrs.module.nigeriaemr.service.FacilityLocationService;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.xml.sax.SAXException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -25,15 +35,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import org.openmrs.module.nigeriaemr.ndrUtils.LoggerUtils;
-import org.openmrs.module.nigeriaemr.ndrUtils.LoggerUtils.LogFormat;
-import org.openmrs.module.nigeriaemr.ndrUtils.LoggerUtils.LogLevel;
-import org.openmrs.module.nigeriaemr.omodmodels.DBConnection;
-import org.openmrs.module.nigeriaemr.omodmodels.FacilityLocation;
-import org.openmrs.module.nigeriaemr.omodmodels.LocationModel;
-import org.openmrs.module.nigeriaemr.omodmodels.PatientLocation;
-import org.openmrs.module.nigeriaemr.service.FacilityLocationService;
-import org.springframework.web.bind.annotation.RequestParam;
 
 public class NdrFragmentController1 {
 	

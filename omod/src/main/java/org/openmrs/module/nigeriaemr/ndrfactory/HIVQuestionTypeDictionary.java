@@ -5,16 +5,16 @@
  */
 package org.openmrs.module.nigeriaemr.ndrfactory;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import org.openmrs.Encounter;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.module.nigeriaemr.model.ndr.CommonQuestionsType;
-import org.openmrs.module.nigeriaemr.ndrUtils.ConstantsUtil;
 import org.openmrs.module.nigeriaemr.ndrUtils.Utils;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author The Bright The goal of this class is to abstract the creation of the CommonQuestionsType

@@ -5,17 +5,6 @@
  */
 package org.openmrs.module.nigeriaemr.dbmanager;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.XMLGregorianCalendar;
 import org.openmrs.Patient;
 import org.openmrs.PersonAddress;
 import org.openmrs.module.nigeriaemr.model.ndr.AddressType;
@@ -25,6 +14,13 @@ import org.openmrs.module.nigeriaemr.model.ndr.RightHandType;
 import org.openmrs.module.nigeriaemr.ndrUtils.Utils;
 import org.openmrs.module.nigeriaemr.omodmodels.CustomObs;
 import org.openmrs.module.nigeriaemr.omodmodels.DBConnection;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.XMLGregorianCalendar;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  *

@@ -37,7 +37,9 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class Utils {
+public class UtilsCustom {
+
+	public static boolean isUtilSingletonInitiated = false;
 	
 	public final static int HIV_Enrollment_Encounter_Type_Id = 14;
 	
@@ -56,7 +58,7 @@ public class Utils {
 	public final static int Patient_PEPFAR_Id = 4;
 	
 	public final static int Patient_Hospital_Id = 3;
-	
+
 	public final static int Patient_RNLSerial_No = 3;
 	
 	public final static int Reason_For_Termination = 165470;
@@ -314,7 +316,6 @@ public class Utils {
 	 */
 	public static List<Obs> extractObsfromEncounter(List<Encounter> encs) {      
         List<Obs> responseObs = new ArrayList<>();
-
         encs.forEach(a -> {
             responseObs.addAll(new ArrayList<>(a.getAllObs()));
         });
@@ -332,6 +333,8 @@ public class Utils {
 		date = calendar.getTime();
 		return date;
 	}
+
+
 	
 	public static List<Obs> getAllObsGroups(List<Obs> obsList, Integer groupingConceptId) {
         List<Obs> response = obsList.stream().filter(obb -> obb.getConcept().getConceptId().equals(groupingConceptId)).collect(Collectors.toList());
@@ -452,14 +455,20 @@ public class Utils {
 		//String visitID = String.valueOf(visitDate.getTime());
 		return visitID;
 	}
-	
+	// Optimized Code
 	public static boolean contains(List<Obs> obsList, int conceptID) {
 		boolean ans = false;
-		for (Obs ele : obsList) {
-			if (ele.getConcept().getConceptId() == conceptID) {
-				ans = true;
-			}
+		Map<Integer, Obs> allObs = UtilsSingleton.obsByConceptID;
+
+		if(allObs.get(conceptID) != null){
+			ans = true;
 		}
+
+//		for (Obs ele : obsList) {
+//			if (ele.getConcept().getConceptId() == conceptID) {
+//				ans = true;
+//			}
+//		}
 		return ans;
 	}
 	
@@ -468,15 +477,15 @@ public class Utils {
 		DateTime startDateTime = null;
 		int durationDays = 0;
 		Obs obs = null;
-		Obs obsGroup = Utils.extractObs(Utils.ARV_DRUGS_GROUPING_CONCEPT_SET, obsList);
-		obs = Utils.extractObsGroupMemberWithConceptID(Utils.MEDICATION_DURATION_CONCEPT, obsList, obsGroup);
+		Obs obsGroup = UtilsCustom.extractObs(Utils.ARV_DRUGS_GROUPING_CONCEPT_SET, obsList);
+		obs = UtilsCustom.extractObsGroupMemberWithConceptID(Utils.MEDICATION_DURATION_CONCEPT, obsList, obsGroup);
 		if (obs != null) {
 			durationDays = (int) obs.getValueNumeric().doubleValue();
 			startDateTime = new DateTime(visitDate);
 			stopDateTime = startDateTime.plusDays(durationDays);
 		}
 		if (stopDateTime == null) {
-			obs = Utils.extractObs(Utils.NEXT_APPOINTMENT_DATE_CONCEPT, obsList);
+			obs = UtilsCustom.extractObs(Utils.NEXT_APPOINTMENT_DATE_CONCEPT, obsList);
 			if (obs != null) {
 				stopDateTime = new DateTime(obs.getValueDate());
 			}
@@ -685,20 +694,22 @@ public class Utils {
 		}
 		return obsListForVisitDate;
 	}
-	
+	// Optimized Code
 	public static Obs extractObs(int conceptID, List<Obs> obsList) {
 
         if (obsList == null) {
             return null;
         }
-        return obsList.stream().filter(ele -> ele.getConcept().getConceptId() == conceptID).findFirst().orElse(null);
+        return UtilsSingleton.obsByConceptID.get(conceptID);
+//        return obsList.stream().filter(ele -> ele.getConcept().getConceptId() == conceptID).findFirst().orElse(null);
     }
-        public static CustomObs extractCustomObs(int conceptID, List<CustomObs> obsList) {
+    //Optimized Code
+    public static CustomObs extractCustomObs(int conceptID, List<CustomObs> obsList) {
 
         if (obsList == null) {
             return null;
         }
-        return obsList.stream().filter(ele -> ele.getConceptID() == conceptID).findFirst().orElse(null);
+         return obsList.stream().filter(ele -> ele.getConceptID() == conceptID).findFirst().orElse(null);
     }
 	
 	public static List<Obs> extractObsList(int conceptID, List<Obs> obsList) {
@@ -955,14 +966,21 @@ public class Utils {
 		yearString = String.valueOf(year);
 		return yearString;
 	}
-	
+	// Optimized code
 	public static Obs extractObsGroupMemberWithConceptID(int conceptID, List<Obs> obsList, Obs obsGrouping) {
 		Obs obs = null;
-		for (Obs ele : obsList) {
-			if (ele.getConcept().getConceptId() == conceptID && ele.getObsGroup().equals(obsGrouping)) {
-				obs = ele;
-			}
+//		for (Obs ele : obsList) {
+//			if (ele.getConcept().getConceptId() == conceptID && ele.getObsGroup().equals(obsGrouping)) {
+//				obs = ele;
+//			}
+//		}
+
+		Obs obsbyGrouping = UtilsSingleton.ObsByGroupID.get(obsGrouping);
+		Obs obsByID = UtilsSingleton.obsByConceptID.get(conceptID);
+		if (obsbyGrouping.equals(obsByID)) {
+			obs = obsGrouping;
 		}
+
 		return obs;
 	}
 	
@@ -1343,11 +1361,17 @@ public class Utils {
 	         return null;
 	     }
 	 }*/
+
+
+	// Optimized Code
 	public static Obs getReasonForTerminationObs(Patient patient) {
-        Optional<Encounter> encounter = Context.getEncounterService()
-                .getEncountersByPatient(patient).stream()
-                .filter(x -> x.getEncounterType().getEncounterTypeId() == Client_Tracking_And_Termination_Encounter_Type_Id)
-                .findAny();
+//        Optional<Encounter> encounter = Context.getEncounterService()
+//                .getEncountersByPatient(patient).stream()
+//                .filter(x -> x.getEncounterType().getEncounterTypeId() == Client_Tracking_And_Termination_Encounter_Type_Id)
+//                .findAny();
+		Optional<Encounter> encounter = UtilsSingleton.allPatientEncounterByPatient.stream()
+				.filter(x -> x.getEncounterType().getEncounterTypeId() == Client_Tracking_And_Termination_Encounter_Type_Id)
+				.findAny();
 
         if (encounter != null && encounter.isPresent()) {
             Optional<Obs> obs = encounter.get().getAllObs().stream()
@@ -1360,15 +1384,22 @@ public class Utils {
         }
         return null;
     }
-	
-	public static Obs getLastAdherenceObs(Patient patient, Date endDate) {
 
-        List<Encounter> encounters = Context.getEncounterService()
-                .getEncountersByPatient(patient).stream()
-                .filter(x -> x.getEncounterType().getEncounterTypeId() == Care_card_Encounter_Type_Id
-                || x.getEncounterType().getEncounterTypeId() == Pharmacy_Encounter_Type_Id)
-                .sorted(Comparator.comparing(Encounter::getEncounterDatetime))
-                .collect(Collectors.toList());
+    //OPTIMIZED CODE
+	public static Obs getLastAdherenceObs(Patient patient, Date endDate) {
+		// CHANGE ONLY THE ENCOUNTERS GENERTION PART
+//        List<Encounter> encounters = Context.getEncounterService()
+//                .getEncountersByPatient(patient).stream()
+//                .filter(x -> x.getEncounterType().getEncounterTypeId() == Care_card_Encounter_Type_Id
+//                || x.getEncounterType().getEncounterTypeId() == Pharmacy_Encounter_Type_Id)
+//                .sorted(Comparator.comparing(Encounter::getEncounterDatetime))
+//                .collect(Collectors.toList());
+
+		List<Encounter> encounters = UtilsSingleton.allPatientEncounterByPatient.stream()
+				.filter(x -> x.getEncounterType().getEncounterTypeId() == Care_card_Encounter_Type_Id
+						|| x.getEncounterType().getEncounterTypeId() == Pharmacy_Encounter_Type_Id)
+				.sorted(Comparator.comparing(Encounter::getEncounterDatetime))
+				.collect(Collectors.toList());
 
         List<Encounter> filteredList = encounters.stream()
                 .filter(x -> x.getEncounterDatetime().before(endDate))
@@ -1395,10 +1426,14 @@ public class Utils {
     }
 	
 	public static Obs getAllTBStatusObs(Patient patient) {
-        Optional<Encounter> encounter = Context.getEncounterService()
-                .getEncountersByPatient(patient).stream()
-                .filter(x -> x.getEncounterType().getEncounterTypeId() == Client_Tracking_And_Termination_Encounter_Type_Id)
-                .findAny();
+//        Optional<Encounter> encounter = Context.getEncounterService()
+//                .getEncountersByPatient(patient).stream()
+//                .filter(x -> x.getEncounterType().getEncounterTypeId() == Client_Tracking_And_Termination_Encounter_Type_Id)
+//                .findAny();
+
+		Optional<Encounter> encounter = UtilsSingleton.allPatientEncounterByPatient.stream()
+				.filter(x -> x.getEncounterType().getEncounterTypeId() == Client_Tracking_And_Termination_Encounter_Type_Id)
+				.findAny();
 
         if (encounter != null && encounter.isPresent()) {
             Optional<Obs> obs = encounter.get().getAllObs().stream()
@@ -1414,12 +1449,18 @@ public class Utils {
 	
 	public static List<Encounter> getLastEncounters(Patient patient, Date endDate) {
 
-        return Context.getEncounterService()
-                .getEncountersByPatient(patient).stream()
-                .filter(x -> x.getEncounterDatetime().before(endDate) && (x.getEncounterType().getEncounterTypeId() == Adult_Ped_Initial_Encounter_Type_Id
-                || x.getEncounterType().getEncounterTypeId() == Care_card_Encounter_Type_Id))
-                .sorted(Comparator.comparing(Encounter::getEncounterDatetime))
-                .collect(Collectors.toList());
+//        return Context.getEncounterService()
+//                .getEncountersByPatient(patient).stream()
+//                .filter(x -> x.getEncounterDatetime().before(endDate) && (x.getEncounterType().getEncounterTypeId() == Adult_Ped_Initial_Encounter_Type_Id
+//                || x.getEncounterType().getEncounterTypeId() == Care_card_Encounter_Type_Id))
+//                .sorted(Comparator.comparing(Encounter::getEncounterDatetime))
+//                .collect(Collectors.toList());
+
+		return UtilsSingleton.allPatientEncounterByPatient.stream()
+				.filter(x -> x.getEncounterDatetime().before(endDate) && (x.getEncounterType().getEncounterTypeId() == Adult_Ped_Initial_Encounter_Type_Id
+						|| x.getEncounterType().getEncounterTypeId() == Care_card_Encounter_Type_Id))
+				.sorted(Comparator.comparing(Encounter::getEncounterDatetime))
+				.collect(Collectors.toList());
     }
 	
 	public static Obs getHighestCD4Obs(Patient patient) {
@@ -1474,9 +1515,13 @@ public class Utils {
 	
 	public static Encounter getLastEncounter(Patient patient, Date endDate) {
 
-        Optional<Encounter> encounters = Context.getEncounterService().getEncountersByPatient(patient)
-                .stream().filter(x -> x.getEncounterDatetime().before(endDate))
-                .max(Comparator.comparing(Encounter::getEncounterDatetime));
+//        Optional<Encounter> encounters = Context.getEncounterService().getEncountersByPatient(patient)
+//                .stream().filter(x -> x.getEncounterDatetime().before(endDate))
+//                .max(Comparator.comparing(Encounter::getEncounterDatetime));
+
+		Optional<Encounter> encounters = UtilsSingleton.allPatientEncounterByPatient
+				.stream().filter(x -> x.getEncounterDatetime().before(endDate))
+				.max(Comparator.comparing(Encounter::getEncounterDatetime));
 
         if (encounters != null && encounters.isPresent()) {
             return encounters.get();
@@ -1645,11 +1690,18 @@ public class Utils {
 	
 	public static Date getHIVEnrollmentDate(Patient patient) {
 
-        Date enrollmentDate = Context.getEncounterService()
-                .getEncountersByPatient(patient).stream()
-                .filter(x -> x.getEncounterType().getEncounterTypeId() == HIV_Enrollment_Encounter_Type_Id)
-                .sorted(Comparator.comparing(Encounter::getEncounterDatetime))
-                .collect(Collectors.toList()).get(0).getEncounterDatetime();
+//        Date enrollmentDate = Context.getEncounterService()
+//                .getEncountersByPatient(patient).stream()
+//                .filter(x -> x.getEncounterType().getEncounterTypeId() == HIV_Enrollment_Encounter_Type_Id)
+//                .sorted(Comparator.comparing(Encounter::getEncounterDatetime))
+//                .collect(Collectors.toList()).get(0).getEncounterDatetime();
+
+
+		Date enrollmentDate = UtilsSingleton.allPatientEncounterByPatient.stream()
+				.filter(x -> x.getEncounterType().getEncounterTypeId() == HIV_Enrollment_Encounter_Type_Id)
+				.sorted(Comparator.comparing(Encounter::getEncounterDatetime))
+				.collect(Collectors.toList()).get(0).getEncounterDatetime();
+
         return enrollmentDate;
     }
 }

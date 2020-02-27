@@ -5,35 +5,20 @@
  */
 package org.openmrs.module.nigeriaemr.ndrfactory;
 
-import java.io.Console;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.XMLGregorianCalendar;
-
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.openmrs.Encounter;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
-import org.openmrs.module.nigeriaemr.model.ndr.AnswerType;
-import org.openmrs.module.nigeriaemr.model.ndr.CodedSimpleType;
-import org.openmrs.module.nigeriaemr.model.ndr.CodedType;
-import org.openmrs.module.nigeriaemr.model.ndr.LaboratoryOrderAndResult;
-import org.openmrs.module.nigeriaemr.model.ndr.LaboratoryReportType;
-import org.openmrs.module.nigeriaemr.model.ndr.NumericType;
+import org.openmrs.module.nigeriaemr.model.ndr.*;
 import org.openmrs.module.nigeriaemr.ndrUtils.ConstantsUtil;
-import org.openmrs.module.nigeriaemr.ndrUtils.LoggerUtils;
-import org.openmrs.module.nigeriaemr.ndrUtils.LoggerUtils.LogFormat;
-import org.openmrs.module.nigeriaemr.ndrUtils.LoggerUtils.LogLevel;
 import org.openmrs.module.nigeriaemr.ndrUtils.Utils;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.XMLGregorianCalendar;
+import java.util.*;
+
 import static org.openmrs.module.nigeriaemr.ndrUtils.Utils.extractObs;
 import static org.openmrs.module.nigeriaemr.ndrUtils.Utils.getXmlDate;
 

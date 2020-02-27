@@ -5,26 +5,22 @@
  */
 package org.openmrs.module.nigeriaemr.ndrfactory;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.Period;
-import java.time.ZoneId;
-import java.util.Arrays;
 import org.openmrs.Encounter;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
+import org.openmrs.PatientIdentifier;
 import org.openmrs.module.nigeriaemr.model.ndr.*;
+import org.openmrs.module.nigeriaemr.model.ndr.AntenatalRegistrationType.Syphilis;
+import org.openmrs.module.nigeriaemr.ndrUtils.ConstantsUtil;
 import org.openmrs.module.nigeriaemr.ndrUtils.Utils;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.XMLGregorianCalendar;
+import java.time.*;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.openmrs.PatientIdentifier;
-import org.openmrs.module.nigeriaemr.model.ndr.AntenatalRegistrationType.Syphilis;
-import org.openmrs.module.nigeriaemr.ndrUtils.ConstantsUtil;
 
 import static org.openmrs.module.nigeriaemr.ndrUtils.Utils.extractObs;
 

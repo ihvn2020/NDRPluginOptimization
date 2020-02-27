@@ -1,8 +1,5 @@
 package org.openmrs.module.nigeriaemr.ndrfactory;
 
-import java.time.Period;
-import java.util.*;
-import javax.xml.datatype.DatatypeConfigurationException;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.openmrs.Encounter;
@@ -11,13 +8,11 @@ import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.module.nigeriaemr.model.ndr.CodedSimpleType;
 import org.openmrs.module.nigeriaemr.model.ndr.HIVEncounterType;
-import org.openmrs.module.nigeriaemr.ndrUtils.ConstantsUtil;
-import org.openmrs.module.nigeriaemr.ndrUtils.LoggerUtils;
-import org.openmrs.module.nigeriaemr.ndrUtils.LoggerUtils.LogFormat;
-import org.openmrs.module.nigeriaemr.ndrUtils.LoggerUtils.LogLevel;
 import org.openmrs.module.nigeriaemr.ndrUtils.Utils;
 
-import static org.openmrs.module.nigeriaemr.ndrUtils.Utils.getXmlDate;
+import javax.xml.datatype.DatatypeConfigurationException;
+import java.time.Period;
+import java.util.*;
 
 public class ClinicalDictionary {
 

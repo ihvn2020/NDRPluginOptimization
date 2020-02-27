@@ -3,7 +3,6 @@ package org.openmrs.module.nigeriaemr.nigeriaQualFactory;
 import org.openmrs.Encounter;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
-import org.openmrs.api.context.Context;
 import org.openmrs.module.nigeriaemr.model.nigeriaqualped.pediatricartadherencerecord.PediatricARTAdherenceRecordDataSetType;
 import org.openmrs.module.nigeriaemr.model.nigeriaqualped.pediatricartadherencerecord.PediatricARTAdherenceRecordType;
 import org.openmrs.module.nigeriaemr.model.nigeriaqualped.pediatricartregimensincestartingtreatment.PediatricARTRegimenSinceStartingTreatmentRecordDataSetType;
@@ -31,7 +30,6 @@ import org.openmrs.module.nigeriaemr.ndrfactory.ClinicalDictionary;
 import org.openmrs.module.nigeriaemr.ndrfactory.LabDictionary;
 import org.xml.sax.SAXException;
 
-import javax.rmi.CORBA.Util;
 import javax.xml.bind.JAXBException;
 import java.io.IOException;
 import java.util.Date;

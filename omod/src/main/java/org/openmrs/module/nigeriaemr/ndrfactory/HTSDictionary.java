@@ -5,26 +5,19 @@
  */
 package org.openmrs.module.nigeriaemr.ndrfactory;
 
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.openmrs.Encounter;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
-import org.openmrs.module.nigeriaemr.model.ndr.*;
-import org.openmrs.module.nigeriaemr.ndrUtils.Utils;
-
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.XMLGregorianCalendar;
-import org.openmrs.EncounterProvider;
-
 import org.openmrs.PatientIdentifier;
-import org.openmrs.Provider;
+import org.openmrs.module.nigeriaemr.model.ndr.*;
 import org.openmrs.module.nigeriaemr.ndrUtils.ConstantsUtil;
 import org.openmrs.module.nigeriaemr.ndrUtils.LoggerUtils;
 import org.openmrs.module.nigeriaemr.ndrUtils.LoggerUtils.LogFormat;
 import org.openmrs.module.nigeriaemr.ndrUtils.LoggerUtils.LogLevel;
+import org.openmrs.module.nigeriaemr.ndrUtils.Utils;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import java.util.*;
 
 import static org.openmrs.module.nigeriaemr.ndrUtils.Utils.extractObs;
 

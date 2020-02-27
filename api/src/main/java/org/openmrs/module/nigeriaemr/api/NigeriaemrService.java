@@ -12,8 +12,8 @@ package org.openmrs.module.nigeriaemr.api;
 import org.openmrs.annotation.Authorized;
 import org.openmrs.api.APIException;
 import org.openmrs.api.OpenmrsService;
-import org.openmrs.module.nigeriaemr.NigeriaemrConfig;
 import org.openmrs.module.nigeriaemr.Item;
+import org.openmrs.module.nigeriaemr.NigeriaemrConfig;
 import org.springframework.transaction.annotation.Transactional;
 
 /**

@@ -1,9 +1,5 @@
 package org.openmrs.module.nigeriaemr.nigeriaQualFactory;
 
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.Concept;
 import org.openmrs.Encounter;
@@ -35,31 +31,27 @@ import org.openmrs.module.nigeriaemr.model.nigeriaqual.tuberculosis.Tuberculosis
 import org.openmrs.module.nigeriaemr.model.nigeriaqual.tuberculosis.TuberculosisRecordType;
 import org.openmrs.module.nigeriaemr.model.nigeriaqual.viralloadtesting.ViralLoadTestingRecordDataSetType;
 import org.openmrs.module.nigeriaemr.model.nigeriaqual.viralloadtesting.ViralLoadTestingRecordType;
+import org.openmrs.module.nigeriaemr.ndrUtils.*;
 import org.openmrs.module.nigeriaemr.ndrfactory.ClinicalDictionary;
 import org.openmrs.module.nigeriaemr.ndrfactory.LabDictionary;
 import org.openmrs.module.nigeriaemr.ndrfactory.NDRMainDictionary;
 import org.openmrs.module.nigeriaemr.ndrfactory.PharmacyDictionary;
 import org.xml.sax.SAXException;
 
-import org.openmrs.module.nigeriaemr.ndrUtils.*;
-
-import java.io.FileWriter;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Comparator;
-import java.util.Date;
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class NigeriaQUALGenerator {
 	

@@ -5,41 +5,28 @@
  */
 package org.openmrs.module.nigeriaemr.ndrfactory;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.XMLGregorianCalendar;
 import org.apache.commons.codec.language.Soundex;
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.Encounter;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
-import org.openmrs.module.nigeriaemr.model.ndr.CodedSimpleType;
-import org.openmrs.module.nigeriaemr.model.ndr.CommonQuestionsType;
-import org.openmrs.module.nigeriaemr.model.ndr.ConditionSpecificQuestionsType;
-import org.openmrs.module.nigeriaemr.model.ndr.FacilityType;
-import org.openmrs.module.nigeriaemr.model.ndr.FingerPrintType;
-import org.openmrs.module.nigeriaemr.model.ndr.HIVQuestionsType;
-import org.openmrs.module.nigeriaemr.model.ndr.IdentifierType;
-import org.openmrs.module.nigeriaemr.model.ndr.IdentifiersType;
-import org.openmrs.module.nigeriaemr.model.ndr.LeftHandType;
-import org.openmrs.module.nigeriaemr.model.ndr.PatientDemographicsType;
-import org.openmrs.module.nigeriaemr.model.ndr.RightHandType;
+import org.openmrs.module.nigeriaemr.model.ndr.*;
 import org.openmrs.module.nigeriaemr.ndrUtils.LoggerUtils;
 import org.openmrs.module.nigeriaemr.ndrUtils.LoggerUtils.LogFormat;
 import org.openmrs.module.nigeriaemr.ndrUtils.Utils;
-import static org.openmrs.module.nigeriaemr.ndrUtils.Utils.getXmlDate;
 import org.openmrs.module.nigeriaemr.omodmodels.CustomObs;
 import org.openmrs.module.nigeriaemr.omodmodels.DBConnection;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.XMLGregorianCalendar;
+import java.sql.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.openmrs.module.nigeriaemr.ndrUtils.Utils.getXmlDate;
 
 /**
  *

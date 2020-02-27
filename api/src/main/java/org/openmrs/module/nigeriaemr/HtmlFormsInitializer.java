@@ -9,11 +9,6 @@
  */
 package org.openmrs.module.nigeriaemr;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.FormService;
@@ -27,6 +22,11 @@ import org.openmrs.module.htmlformentryui.HtmlFormUtil;
 import org.openmrs.module.nigeriaemr.util.ExtensionFormUtil;
 import org.openmrs.ui.framework.resource.ResourceFactory;
 import org.openmrs.ui.framework.resource.ResourceProvider;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Sets up the HFE forms 1) Scans the webapp/resources/htmlforms folder 2) Attempts to create an HFE

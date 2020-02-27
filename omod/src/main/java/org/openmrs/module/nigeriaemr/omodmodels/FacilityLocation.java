@@ -6,6 +6,7 @@
 package org.openmrs.module.nigeriaemr.omodmodels;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.util.Date;
 
 /**

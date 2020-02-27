@@ -19,9 +19,10 @@ import org.openmrs.api.UserService;
 import org.openmrs.module.nigeriaemr.Item;
 import org.openmrs.module.nigeriaemr.api.dao.NigeriaemrDao;
 import org.openmrs.module.nigeriaemr.api.impl.NigeriaemrServiceImpl;
-import static org.mockito.Mockito.*;
+
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 /**
  * This is a unit test, which verifies logic in NigeriaemrService. It doesn't extend

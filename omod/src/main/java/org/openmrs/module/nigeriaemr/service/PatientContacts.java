@@ -8,25 +8,7 @@ package org.openmrs.module.nigeriaemr.service;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.hibernate.id.IntegralDataTypeHolder;
-import org.openmrs.EncounterType;
-import org.openmrs.Field;
-import org.openmrs.Form;
-import org.openmrs.FormField;
-import org.openmrs.Location;
-import org.openmrs.Patient;
-import org.openmrs.PatientIdentifier;
-import org.openmrs.PatientIdentifierType;
-import org.openmrs.Person;
+import org.openmrs.*;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.htmlformentry.HtmlForm;
 import org.openmrs.module.htmlformentry.HtmlFormEntryService;
@@ -34,9 +16,13 @@ import org.openmrs.module.nigeriaemr.dbmanager.NdrDBManager;
 import org.openmrs.module.nigeriaemr.ndrUtils.ConstantsUtil;
 import org.openmrs.module.nigeriaemr.ndrUtils.GeneralMapper;
 import org.openmrs.module.nigeriaemr.omodmodels.Client;
-import org.openmrs.module.nigeriaemr.omodmodels.CommunityTestersPayload;
 import org.openmrs.module.nigeriaemr.omodmodels.PatientContactsModel;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.sql.SQLException;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author MORRISON.I

@@ -5,45 +5,11 @@
  */
 package org.openmrs.module.nigeriaemr.ndrfactorycustom;
 
-import java.io.File;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.nio.file.Paths;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import javax.servlet.http.HttpServletRequest;
-import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 import org.openmrs.Patient;
 import org.openmrs.PersonAddress;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.nigeriaemr.dbmanager.ObsDAO;
-import org.openmrs.module.nigeriaemr.model.ndr.AddressType;
-import org.openmrs.module.nigeriaemr.model.ndr.ConditionType;
-import org.openmrs.module.nigeriaemr.model.ndr.Container;
-import org.openmrs.module.nigeriaemr.model.ndr.FacilityType;
-import org.openmrs.module.nigeriaemr.model.ndr.FingerPrintType;
-import org.openmrs.module.nigeriaemr.model.ndr.IndividualReportType;
-import org.openmrs.module.nigeriaemr.model.ndr.MessageHeaderType;
-import org.openmrs.module.nigeriaemr.model.ndr.PatientDemographicsType;
-import org.openmrs.module.nigeriaemr.model.ndr.ProgramAreaType;
-import org.openmrs.module.nigeriaemr.ndrUtils.CustomErrorHandler;
+import org.openmrs.module.nigeriaemr.model.ndr.*;
 import org.openmrs.module.nigeriaemr.ndrUtils.LoggerUtils;
 import org.openmrs.module.nigeriaemr.ndrUtils.Utils;
 import org.openmrs.module.nigeriaemr.ndrUtils.Validator;
@@ -52,6 +18,23 @@ import org.openmrs.module.nigeriaemr.omodmodels.CustomObs;
 import org.openmrs.module.nigeriaemr.omodmodels.DBConnection;
 import org.openmrs.scheduler.tasks.AbstractTask;
 import org.xml.sax.SAXException;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.xml.XMLConstants;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import java.io.File;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.nio.file.Paths;
+import java.sql.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.*;
 
 /**
  *

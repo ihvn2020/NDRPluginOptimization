@@ -6,17 +6,17 @@
 package org.openmrs.module.nigeriaemr.page.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Date;
-import java.util.UUID;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.nigeriaemr.ndrUtils.Utils;
 import org.openmrs.module.nigeriaemr.omodmodels.PatientContactsModel;
-import org.openmrs.module.nigeriaemr.omodmodels.TesterModel;
 import org.openmrs.module.nigeriaemr.service.CommunityTesters;
 import org.openmrs.module.nigeriaemr.service.PatientContacts;
 import org.openmrs.ui.framework.annotation.SpringBean;
 import org.openmrs.ui.framework.page.PageModel;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.Date;
+import java.util.UUID;
 
 /**
  * @author MORRISON.I
