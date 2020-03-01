@@ -173,7 +173,7 @@ public class PMTCTDictionary {
             }
 
             //get data for Syphilis and add to antenatal reg type
-            LoggerUtils.write(PMTCTDictionary.class.getName(), "About to pull all SYPHILIS", LogFormat.FATAL, LogLevel.live);
+            //LoggerUtils.write(PMTCTDictionary.class.getName(), "About to pull all SYPHILIS", LogFormat.FATAL, LogLevel.live);
             Syphilis syphilis = new Syphilis();
             obs = extractObs(Test_For_Syphilis_Concept_Id, anthenatalObsList);
             if (obs != null && obs.getValueCoded() != null) {
@@ -192,12 +192,12 @@ public class PMTCTDictionary {
                 syphilis.setReferredSyphilisPositiveClient(getMappedValue(obs.getValueCoded().getConceptId()));
             }
             registrationType.setSyphilis(syphilis);
-            LoggerUtils.write(PMTCTDictionary.class.getName(), "Finished pulling SYPHILIS", LogFormat.FATAL, LogLevel.live);
+            //LoggerUtils.write(PMTCTDictionary.class.getName(), "Finished pulling SYPHILIS", LogFormat.FATAL, LogLevel.live);
 
             //}
             return registrationType;
         } catch (Exception ex) {
-            LoggerUtils.write(PMTCTDictionary.class.getName(), ex.getMessage(), LogFormat.FATAL, LogLevel.live);
+            //LoggerUtils.write(PMTCTDictionary.class.getName(), ex.getMessage(), LogFormat.FATAL, LogLevel.live);
             throw new DatatypeConfigurationException(Arrays.toString(ex.getStackTrace()));
         }
 
@@ -235,7 +235,7 @@ public class PMTCTDictionary {
                 try {
                     deliveryEncounterType.setHBVStatus(getMappedValue(obs.getValueCoded().getConceptId()));//get the value coded here and know the codee
                 } catch (Exception ex) {
-                    LoggerUtils.write(PMTCTDictionary.class.getName(), "Error on Hbv_Status_Concept_Id: " + ex.getMessage(), LogFormat.FATAL, LogLevel.live);
+                   // LoggerUtils.write(PMTCTDictionary.class.getName(), "Error on Hbv_Status_Concept_Id: " + ex.getMessage(), LogFormat.FATAL, LogLevel.live);
                 }
             }
             obs = extractObs(Hcv_Status_Concept_Id, anthenatalObsList);
@@ -296,7 +296,7 @@ public class PMTCTDictionary {
             //}
             return deliveryEncounterType;
         } catch (Exception ex) {
-            LoggerUtils.write(PMTCTDictionary.class.getName(), ex.getMessage(), LogFormat.FATAL, LogLevel.live);
+            //LoggerUtils.write(PMTCTDictionary.class.getName(), ex.getMessage(), LogFormat.FATAL, LogLevel.live);
            // throw new DatatypeConfigurationException(Arrays.toString(ex.getStackTrace()));
         }
         
@@ -320,10 +320,10 @@ public class PMTCTDictionary {
                 try {
                     childBirthDetailsType.setChildEIDNumber(obs.getValueText());
                 } catch (Exception ex) {
-                    LoggerUtils.write(PMTCTDictionary.class.getName(), "Error on Hiv_Exposed_Infant_Number_Concept_Id: " + ex.getMessage(), LogFormat.FATAL, LogLevel.live);
+                    //LoggerUtils.write(PMTCTDictionary.class.getName(), "Error on Hiv_Exposed_Infant_Number_Concept_Id: " + ex.getMessage(), LogFormat.FATAL, LogLevel.live);
                 }
             }
-            LoggerUtils.write(PMTCTDictionary.class.getName(), "About to pull all data for CHILD_BIRTH_DETAIL_TYPE", LogFormat.FATAL, LogLevel.debug);
+            //LoggerUtils.write(PMTCTDictionary.class.getName(), "About to pull all data for CHILD_BIRTH_DETAIL_TYPE", LogFormat.FATAL, LogLevel.debug);
             obs = extractObs(Date_of_Birth_Concept_Id, antenatalObsList);
             if (obs != null && obs.getValueDatetime() != null) {
                 childBirthDetailsType.setChildDateOfBirth(Utils.getXmlDate(obs.getValueDate()));
@@ -371,12 +371,12 @@ public class PMTCTDictionary {
             if (obs != null && obs.getValueText() != null) {
                 childBirthDetailsType.setImmunizationReceived(obs.getValueText());
             }
-            LoggerUtils.write(PMTCTDictionary.class.getName(), "Finished pulling all data for CHILD_BIRTH_DETAIL_TYPE", LogFormat.FATAL, LogLevel.debug);
+            //LoggerUtils.write(PMTCTDictionary.class.getName(), "Finished pulling all data for CHILD_BIRTH_DETAIL_TYPE", LogFormat.FATAL, LogLevel.debug);
 
             //}
             return childBirthDetailsType;
         } catch (Exception ex) {
-            LoggerUtils.write(PMTCTDictionary.class.getName(), ex.getMessage(), LogFormat.FATAL, LogLevel.live);
+            //LoggerUtils.write(PMTCTDictionary.class.getName(), ex.getMessage(), LogFormat.FATAL, LogLevel.live);
            // throw new DatatypeConfigurationException(Arrays.toString(ex.getStackTrace()));
         }
         
@@ -400,7 +400,7 @@ public class PMTCTDictionary {
                 try {
                     childFollowupType.setInfantARVType(getMappedValue(obs.getValueCoded().getConceptId()));
                 } catch (Exception ex) {
-                    LoggerUtils.write(PMTCTDictionary.class.getName(), "Error on Infant_Arv_Type_Concept_Id: " + ex.getMessage(), LogFormat.FATAL, LogLevel.live);
+                    //LoggerUtils.write(PMTCTDictionary.class.getName(), "Error on Infant_Arv_Type_Concept_Id: " + ex.getMessage(), LogFormat.FATAL, LogLevel.live);
                 }
             }
             obs = extractObs(Timimg_Of_Arv_Prophylaxis_Concept_Id, antenatalObsList);
@@ -429,7 +429,7 @@ public class PMTCTDictionary {
 
             return childFollowupType;
         } catch (Exception ex) {
-            LoggerUtils.write(PMTCTDictionary.class.getName(), ex.getMessage(), LogFormat.FATAL, LogLevel.live);
+            //LoggerUtils.write(PMTCTDictionary.class.getName(), ex.getMessage(), LogFormat.FATAL, LogLevel.live);
             //throw new DatatypeConfigurationException(Arrays.toString(ex.getStackTrace()));
         }
         
@@ -463,7 +463,7 @@ public class PMTCTDictionary {
             return immunizationType;
 
         } catch (Exception ex) {
-            LoggerUtils.write(PMTCTDictionary.class.getName(), ex.getMessage(), LogFormat.FATAL, LogLevel.live);
+            //LoggerUtils.write(PMTCTDictionary.class.getName(), ex.getMessage(), LogFormat.FATAL, LogLevel.live);
           //  throw new DatatypeConfigurationException(Arrays.toString(ex.getStackTrace()));
         }
         
@@ -519,7 +519,7 @@ public class PMTCTDictionary {
             //}
             return infantPCRTestingType;
         } catch (Exception ex) {
-            LoggerUtils.write(PMTCTDictionary.class.getName(), ex.getMessage(), LogFormat.FATAL, LogLevel.live);
+           // LoggerUtils.write(PMTCTDictionary.class.getName(), ex.getMessage(), LogFormat.FATAL, LogLevel.live);
            // throw new DatatypeConfigurationException(Arrays.toString(ex.getStackTrace()));
         }
         

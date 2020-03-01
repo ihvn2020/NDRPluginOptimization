@@ -189,7 +189,7 @@ public class LoggerUtils {
 			
 		}
 		catch (SQLException ex) {
-			LoggerUtils.write(LoggerUtils.class.getName(), ex.getMessage(), LogFormat.FATAL, LogLevel.live);
+			//LoggerUtils.write(LoggerUtils.class.getName(), ex.getMessage(), LogFormat.FATAL, LogLevel.live);
 		}
 		finally {
 			try {

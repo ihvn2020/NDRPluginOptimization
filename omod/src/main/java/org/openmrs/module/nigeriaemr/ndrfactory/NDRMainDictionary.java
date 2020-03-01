@@ -251,7 +251,7 @@ public class NDRMainDictionary {
         try {
             return htsDictionary.createClientIntakeTags(patient, enc, allObs, hivTestingReport);
         } catch (Exception ex) {
-            LoggerUtils.write(NDRMainDictionary.class.getName(), ex.getMessage(), LogFormat.FATAL, LogLevel.live);
+            //LoggerUtils.write(NDRMainDictionary.class.getName(), ex.getMessage(), LogFormat.FATAL, LogLevel.live);
         }
         return hivTestingReport;
     }
@@ -332,7 +332,7 @@ public class NDRMainDictionary {
                }
            }
        }catch(Exception ex){
-           LoggerUtils.write(NDRMainDictionary.class.getName(),ex.getMessage(),LogFormat.WARNING,LogLevel.debug);
+          // LoggerUtils.write(NDRMainDictionary.class.getName(),ex.getMessage(),LogFormat.WARNING,LogLevel.debug);
        }
         return partnerDetailsTypes;
     }

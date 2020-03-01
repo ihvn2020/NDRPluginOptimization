@@ -422,8 +422,8 @@ public class Utils {
 			return versionModel;
 		}
 		catch (Exception e) {
-			LoggerUtils.write(Utils.class.getName(), "Error locating version file: " + e.getMessage(),
-			    LoggerUtils.LogFormat.FATAL, LogLevel.live);
+			//LoggerUtils.write(Utils.class.getName(), "Error locating version file: " + e.getMessage(),
+			//   LoggerUtils.LogFormat.FATAL, LogLevel.live);
 			return null;
 		}
 	}
@@ -1562,7 +1562,7 @@ public class Utils {
 			
 		}
 		catch (Exception ex) {
-			LoggerUtils.write(Utils.class.getName(), ex.getMessage(), LogFormat.FATAL, LogLevel.live);
+			//LoggerUtils.write(Utils.class.getName(), ex.getMessage(), LogFormat.FATAL, LogLevel.live);
 		}
 		
 		return result;

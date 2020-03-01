@@ -23,6 +23,7 @@ import org.joda.time.DateTimeComparator;
 
 import org.openmrs.*;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.nigeriaemr.dbmanager.ObsDAO;
 import org.openmrs.module.nigeriaemr.model.ndr.*;
 import org.openmrs.module.nigeriaemr.ndrUtils.ConstantsUtil;
 import org.openmrs.module.nigeriaemr.ndrUtils.Utils;
@@ -57,7 +58,7 @@ public class NDRConverter {
 		this.openmrsConn = _openmrsConn;
 	}
 	
-	public Container createContainer(Patient pts, FacilityType facility) throws DatatypeConfigurationException {
+	public Container createContainer(Patient pts, FacilityType facility,ObsDAO dao) throws DatatypeConfigurationException {
 
         Container container = new Container();
         try {
@@ -125,7 +126,7 @@ public class NDRConverter {
 
             container.setMessageHeader(header);
 
-            IndividualReportType individualReportType = createIndividualReportType();
+            IndividualReportType individualReportType = createIndividualReportType(dao);
 
             if (individualReportType == null) {
                 return null;
@@ -134,13 +135,13 @@ public class NDRConverter {
             container.setIndividualReport(individualReportType);
             return container;
         } catch (Exception ex) {
-            LoggerUtils.write(NDRConverter.class.getName(), ex.getMessage(), LoggerUtils.LogFormat.FATAL, LogLevel.live);
+            //LoggerUtils.write(NDRConverter.class.getName(), ex.getMessage(), LoggerUtils.LogFormat.FATAL, LogLevel.live);
             // throw new DatatypeConfigurationException(Arrays.toString(ex.getStackTrace()));
         }
         return container;
     }
 	
-	private IndividualReportType createIndividualReportType() throws DatatypeConfigurationException {
+	private IndividualReportType createIndividualReportType(ObsDAO dao) throws DatatypeConfigurationException {
 
         IndividualReportType individualReport = new IndividualReportType();
         try {
@@ -153,11 +154,18 @@ public class NDRConverter {
             if (patientDemography == null) { //return null if no valid patient data exist
                 return null;
             }
-
+            if(patientDemography!=null){
+                patientDemography.setFingerPrints(dao.getPatientsFingerPrint(patient));
+            }
+            
             //create hiv condition type with code "86406008"
             ConditionType condition = createHIVCondition();
+            if(condition !=null){
+                condition.setPatientAddress(dao.createPatientAddress(patient));
+            }
+            
             if (condition == null) {
-                return null; //return null if the condition parameters are empty
+                //return null; //return null if the condition parameters are empty
             }
 
             individualReport.setPatientDemographics(patientDemography);
@@ -172,7 +180,7 @@ public class NDRConverter {
                     List<HIVTestingReportType> hivReportTypes = createHIVTestingReport(intakeEncounter, intakeObs);
                     individualReport.getHIVTestingReport().addAll(hivReportTypes);
                 } catch (Exception ex) {
-                    LoggerUtils.write(NDRConverter.class.getName(), ex.getMessage(), LoggerUtils.LogFormat.FATAL, LogLevel.live);
+                    //LoggerUtils.write(NDRConverter.class.getName(), ex.getMessage(), LoggerUtils.LogFormat.FATAL, LogLevel.live);
                 }
                 //  }
             }
@@ -261,7 +269,7 @@ public class NDRConverter {
             hivTestingReportList.add(hivTestingReport);
 
         } catch (Exception ex) {
-            LoggerUtils.write(NDRConverter.class.toString(), ex.getMessage(), LoggerUtils.LogFormat.FATAL, LogLevel.live);
+            //LoggerUtils.write(NDRConverter.class.toString(), ex.getMessage(), LoggerUtils.LogFormat.FATAL, LogLevel.live);
         }
 
         return hivTestingReportList;
@@ -281,7 +289,7 @@ public class NDRConverter {
             condition.setConditionCode("86406008");
 
             //create address
-            condition.setPatientAddress(createPatientAddress());
+            //condition.setPatientAddress(createPatientAddress());
 
             //create program area
             condition.setProgramArea(createProgramArea());
@@ -330,8 +338,8 @@ public class NDRConverter {
                     condition.getPartnerDetails().addAll(partnerDetailsType);
                 }
             } catch (Exception ex) {
-                LoggerUtils.write(NDRMainDictionary.class.getName(), ex.getMessage(), LoggerUtils.LogFormat.FATAL,
-                        LogLevel.live);
+                //LoggerUtils.write(NDRMainDictionary.class.getName(), ex.getMessage(), LoggerUtils.LogFormat.FATAL,
+                 //       LogLevel.live);
             }
 
             List<RegimenType> arvRegimenTypeList = mainDictionary.createRegimenTypeList(patient, encounters, this.allobs);
@@ -413,8 +421,8 @@ public class NDRConverter {
 			}
 			catch (SQLException e) {
 				e.printStackTrace();
-				LoggerUtils.write(NDRMainDictionary.class.getName(), e.getMessage(), LoggerUtils.LogFormat.FATAL,
-				    LogLevel.live);
+				//LoggerUtils.write(NDRMainDictionary.class.getName(), e.getMessage(), LoggerUtils.LogFormat.FATAL,
+				//    LogLevel.live);
 			}
 			finally {
 				

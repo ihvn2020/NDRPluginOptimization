@@ -45,8 +45,8 @@ public class CommunityTesters {
 				dbManageer.closeConnection();
 			}
 			catch (SQLException ex) {
-				LoggerUtils.write(CommunityTesters.class.getName(), ex.getMessage(), LoggerUtils.LogFormat.FATAL,
-				    LoggerUtils.LogLevel.live);
+				//LoggerUtils.write(CommunityTesters.class.getName(), ex.getMessage(), LoggerUtils.LogFormat.FATAL,
+				//    LoggerUtils.LogLevel.live);
 			}
 		}
 	}
@@ -76,7 +76,7 @@ public class CommunityTesters {
             dbManageer.closeConnection();
             return response;
         } catch (SQLException ex) {
-            LoggerUtils.write(CommunityTesters.class.getName(), ex.getMessage(), LoggerUtils.LogFormat.FATAL, LoggerUtils.LogLevel.live);
+            //LoggerUtils.write(CommunityTesters.class.getName(), ex.getMessage(), LoggerUtils.LogFormat.FATAL, LoggerUtils.LogLevel.live);
         }
         //return empty list
         return response;
