@@ -42,6 +42,8 @@ import org.openmrs.module.nigeriaemr.ndrUtils.LoggerUtils.LogFormat;
 import org.openmrs.module.nigeriaemr.ndrUtils.LoggerUtils.LogLevel;
 import org.openmrs.module.nigeriaemr.omodmodels.DBConnection;
 import org.openmrs.module.nigeriaemr.omodmodels.Version;
+import org.openmrs.module.nigeriaemr.xmlgenerator.CustomEncounter;
+import org.openmrs.module.nigeriaemr.xmlgenerator.CustomPatient;
 import org.openmrs.util.OpenmrsUtil;
 
 public class Utils {
@@ -270,6 +272,8 @@ public class Utils {
 	
 	public final static int PREGNANCY_BREASTFEEDING_STATUS = 165050;
 	
+	public final static int NOT_PREGNANT_CONCEPT = 165047;
+	
 	/* PatientDemographics Specific Concept */
 	public final static int DATE_OF_TERMINATION_CONCEPT = 165469;
 	
@@ -447,6 +451,12 @@ public class Utils {
 	
 	public static String getVisitId(Patient pts, Encounter enc) {
 		return enc.getEncounterId().toString(); //getVisit().getVisitId().toString();
+		/*String dateString = new SimpleDateFormat("dd-MM-yyyy").format(enc.getEncounterDatetime());
+		return pts.getPatientIdentifier(3).getIdentifier() + "-" + dateString;*/
+	}
+	
+	public static String getVisitId(CustomPatient pts, CustomEncounter enc) {
+		return enc.getEncounterId() + ""; //getVisit().getVisitId().toString();
 		/*String dateString = new SimpleDateFormat("dd-MM-yyyy").format(enc.getEncounterDatetime());
 		return pts.getPatientIdentifier(3).getIdentifier() + "-" + dateString;*/
 	}
@@ -672,6 +682,7 @@ public class Utils {
 		Obs obs = null;
 		if (obsList != null) {
 			for (Obs ele : obsList) {
+				
 				if (ele.getConcept().getConceptId() == conceptID && ele.getValueCoded().getConceptId() == valueCoded) {
 					obs = ele;
 				}
@@ -870,18 +881,28 @@ public class Utils {
 	}
 	
 	public static String getDayDD(Date date) {
+		
 		String dayString = "";
 		DateTime dateTime = new DateTime(date);
 		int day = dateTime.getDayOfMonth();
-		dayString = StringUtils.leftPad(String.valueOf(day), 2, "0");
+		
+		dayString = leftPad(String.valueOf(day));//StringUtils.leftPad(String.valueOf(day), 2, "0");
 		return dayString;
+	}
+	
+	public static String leftPad(String val) {
+		if (val.length() < 2) {
+			return "0" + val;
+		} else {
+			return val;
+		}
 	}
 	
 	public static String getMonthMM(Date date) {
 		String monthString = "";
 		DateTime dateTime = new DateTime(date);
 		int month = dateTime.getMonthOfYear();
-		monthString = StringUtils.leftPad(String.valueOf(month), 2, "0");
+		monthString = leftPad(String.valueOf(month));//StringUtils.leftPad(String.valueOf(month), 2, "0");
 		return monthString;
 	}
 	

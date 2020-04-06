@@ -15,6 +15,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.XMLGregorianCalendar;
 import org.apache.commons.codec.language.Soundex;
@@ -23,6 +25,7 @@ import org.openmrs.Encounter;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
+import org.openmrs.module.nigeriaemr.fragment.controller.OBSUtil;
 import org.openmrs.module.nigeriaemr.model.ndr.CodedSimpleType;
 import org.openmrs.module.nigeriaemr.model.ndr.CommonQuestionsType;
 import org.openmrs.module.nigeriaemr.model.ndr.ConditionSpecificQuestionsType;
@@ -39,6 +42,7 @@ import org.openmrs.module.nigeriaemr.ndrUtils.LoggerUtils.LogFormat;
 import org.openmrs.module.nigeriaemr.ndrUtils.Utils;
 import static org.openmrs.module.nigeriaemr.ndrUtils.Utils.getXmlDate;
 import org.openmrs.module.nigeriaemr.omodmodels.DBConnection;
+import org.openmrs.module.nigeriaemr.xmlgenerator.CustomEncounter;
 
 /**
  *
@@ -49,7 +53,8 @@ public class NDRCommonQuestionsDictionary {
 
     private static Map<Integer, String> map = new HashMap<>();
     private PharmacyDictionary pharmacyDictionary;
-
+    private Connection connection;
+    private Statement statement;
     public NDRCommonQuestionsDictionary() {
         loadDictionary();
         pharmacyDictionary = new PharmacyDictionary();
@@ -136,32 +141,32 @@ public class NDRCommonQuestionsDictionary {
 
     }
 
-    public PatientDemographicsType createPatientDemographicsType(Patient pts, FacilityType facility, List<Obs> allObsListForPatient, List<Encounter> allPatientEncounters, DBConnection openmrsConn) throws DatatypeConfigurationException {
+    public PatientDemographicsType createPatientDemographicsType(Patient pts, FacilityType facility, OBSUtil obsUtil, List<Encounter> allPatientEncounters, DBConnection openmrsConn) throws DatatypeConfigurationException {
         /*
             PatientDemographicsType
               -PatientIdentifier
                -TreatmentFacility
-  -OtherPatientIdentifiers
-  -PatientDateOfBirth
-  -PatientSexCode
-  -PatientDeceasedIndicator
-  -PatientDeceasedDate
-  -PatientPrimaryLanguageCode
-  -PatientEducationLevelCode
-  -PatientOccupationCode
-  -PatientMaritalStatusCode
-  -StateOfNigeriaOriginCode
-  -PatientNotes (NoteType)
-  -FingerPrints
-  -EnrolleeCode
-  -TelephoneType
-  -Extension
-  -EmailAddress
-  -TelephoneTypeCode
+            -OtherPatientIdentifiers
+            -PatientDateOfBirth
+            -PatientSexCode
+            -PatientDeceasedIndicator
+            -PatientDeceasedDate
+            -PatientPrimaryLanguageCode
+            -PatientEducationLevelCode
+            -PatientOccupationCode
+            -PatientMaritalStatusCode
+            -StateOfNigeriaOriginCode
+            -PatientNotes (NoteType)
+            -FingerPrints
+            -EnrolleeCode
+            -TelephoneType
+            -Extension
+            -EmailAddress
+            -TelephoneTypeCode
   
          */
         PatientDemographicsType demo = new PatientDemographicsType();
-        try {
+        /*try {
 
             //Identifier 4 is Pepfar ID
             PatientIdentifier pepfarid, pidHospital, pidOthers, htsId, ancId, exposedInfantId, pepId;
@@ -169,7 +174,7 @@ public class NDRCommonQuestionsDictionary {
             //use combination of rdatimcode and hospital for peffar on surge rivers.
             pepfarid = new PatientIdentifier();
             // pepfarid.setIdentifier(String.valueOf(pts.getPatientIdentifier(4)));
-
+           // pts.getPa
             pidHospital = pts.getPatientIdentifier(Utils.HOSPITAL_IDENTIFIER_INDEX);
             pidOthers = pts.getPatientIdentifier(Utils.OTHER_IDENTIFIER_INDEX);
             htsId = pts.getPatientIdentifier(Utils.HTS_IDENTIFIER_INDEX);
@@ -240,7 +245,7 @@ public class NDRCommonQuestionsDictionary {
              * Edited By Johnbosco
              * */
             //check Finger Print if available
-            demo.setFingerPrints(getPatientsFingerPrint(pts.getPatientId(), openmrsConn));
+            /*demo.setFingerPrints(getPatientsFingerPrint(pts.getPatientId(), openmrsConn));
 
             //collect data for SURGE
             if (Utils.isSurgeSite() == "true") {
@@ -260,15 +265,15 @@ public class NDRCommonQuestionsDictionary {
 
             String ndrCodedValue;
             Integer[] formEncounterTypeTargets = {Utils.ADULT_INITIAL_ENCOUNTER_TYPE, Utils.PED_INITIAL_ENCOUNTER_TYPE, Utils.INITIAL_ENCOUNTER_TYPE, Utils.HIV_Enrollment_Encounter_Type_Id, Utils.Client_Tracking_And_Termination_Encounter_Type_Id};
-            List<Obs> obsListForEncounterTypes = Utils.extractObsListForEncounterType(allObsListForPatient, formEncounterTypeTargets);
+            List<Obs> obsListForEncounterTypes = obsUtil.getAllObsForEncounters(formEncounterTypeTargets); //Utils.extractObsListForEncounterType(allObsListForPatient, formEncounterTypeTargets);
             Obs obs = null;
             if (obsListForEncounterTypes != null && !obsListForEncounterTypes.isEmpty()) {
                 //check for disease indicator
-                obs = Utils.extractObs(Utils.REASON_FOR_TERMINATION_CONCEPT, obsListForEncounterTypes);
+                obs = obsUtil.getObsForConcept(Utils.REASON_FOR_TERMINATION_CONCEPT);//Utils.extractObs(Utils.REASON_FOR_TERMINATION_CONCEPT, obsListForEncounterTypes);
                 if (obs != null && obs.getValueCoded() != null) {
-                    if (obs.getValueCoded().getConceptId() == Utils.DEAD_CONCEPT) {
+                    if (obsUtil.getValueCodedForObs(obs.getId()) == Utils.DEAD_CONCEPT) {
                         demo.setPatientDeceasedIndicator(true);
-                        obs = Utils.extractObs(Utils.DATE_OF_TERMINATION_CONCEPT, obsListForEncounterTypes);
+                        obs = obsUtil.getObsForConcept(Utils.DATE_OF_TERMINATION_CONCEPT);//Utils.extractObs(Utils.DATE_OF_TERMINATION_CONCEPT, obsListForEncounterTypes);
                         //set date
                         if (obs != null) {
                             demo.setPatientDeceasedDate(getXmlDate(obs.getObsDatetime()));
@@ -278,9 +283,9 @@ public class NDRCommonQuestionsDictionary {
                     }
                 }
                 //check Educational level
-                obs = Utils.extractObs(Utils.EDUCATIONAL_LEVEL_CONCEPT, obsListForEncounterTypes);
+                obs = obsUtil.getObsForConcept(Utils.EDUCATIONAL_LEVEL_CONCEPT);//Utils.extractObs(Utils.EDUCATIONAL_LEVEL_CONCEPT, obsListForEncounterTypes);
                 if (obs != null && obs.getValueCoded() != null) {
-                    ndrCodedValue = getMappedValue(obs.getValueCoded().getConceptId());
+                    ndrCodedValue = getMappedValue(obsUtil.getValueCodedForObs(obs.getId()));
                     if (ndrCodedValue.equals("N")) {
                         demo.setPatientEducationLevelCode("1");
                     } else {
@@ -295,24 +300,25 @@ public class NDRCommonQuestionsDictionary {
                 //demo.setPatientPrimaryLanguageCode(ndrCodedValue);
                 // }
                 //check Occupational Code
-                obs = Utils.extractObs(Utils.OCCUPATIONAL_STATUS_CONCEPT, obsListForEncounterTypes);
+                obs = obsUtil.getObsForConcept(Utils.OCCUPATIONAL_STATUS_CONCEPT);//Utils.extractObs(Utils.OCCUPATIONAL_STATUS_CONCEPT, obsListForEncounterTypes);
                 if (obs != null && obs.getValueCoded() != null) {
-                    ndrCodedValue = getMappedValue(obs.getValueCoded().getConceptId());
+                    ndrCodedValue = getMappedValue(obsUtil.getValueCodedForObs(obs.getId()));
                     demo.setPatientOccupationCode(ndrCodedValue);
                 }
                 //check Marital Status Code
-                obs = Utils.extractObs(Utils.MARITAL_STATUS_CONCEPT, obsListForEncounterTypes);
+                obs = obsUtil.getObsForConcept(Utils.MARITAL_STATUS_CONCEPT);//Utils.extractObs(Utils.MARITAL_STATUS_CONCEPT, obsListForEncounterTypes);
                 if (obs != null && obs.getValueCoded() != null) {
-                    ndrCodedValue = getMappedValue(obs.getValueCoded().getConceptId());
+                    ndrCodedValue = getMappedValue(obsUtil.getValueCodedForObs(obs.getId()));
                     demo.setPatientMaritalStatusCode(ndrCodedValue);
                 }
             }
+            System.out.println("completed createPatientDemographicsType");
 
             return demo;
         } catch (Exception ex) {
             LoggerUtils.write(NDRMainDictionary.class.getName(), ex.getMessage(), LoggerUtils.LogFormat.FATAL, LoggerUtils.LogLevel.live);
             //throw new DatatypeConfigurationException(Arrays.toString(ex.getStackTrace()));
-        }
+        }*/
         
          return demo;
 
@@ -326,12 +332,12 @@ public class NDRCommonQuestionsDictionary {
     }
 
     public FingerPrintType getPatientsFingerPrint(int id, DBConnection connResult) {
-        Connection connection;
+        
         try {
 
             //  DBConnection connResult = Utils.getNmrsConnectionDetails();
             connection = DriverManager.getConnection(connResult.getUrl(), connResult.getUsername(), connResult.getPassword());
-            Statement statement = connection.createStatement();
+            statement = connection.createStatement();
             String sqlStatement = ("SELECT template, fingerPosition, date_created,creator FROM biometricinfo WHERE patient_Id = " + id);
             ResultSet result = statement.executeQuery(sqlStatement);
             FingerPrintType fingerPrintsType = new FingerPrintType();
@@ -395,28 +401,37 @@ public class NDRCommonQuestionsDictionary {
                 fingerPrintsType.setRightHand(rightFingerType);
                 fingerPrintsType.setLeftHand(leftFingerType);
             } else {
-                connection.close();
+                //connection.close();
                 return null;
             }
-            connection.close();
+            //connection.close();
             return fingerPrintsType;
         } catch (SQLException e) {
             e.printStackTrace();
             LoggerUtils.write(NDRMainDictionary.class.getName(), e.getMessage(), LogFormat.FATAL, LoggerUtils.LogLevel.live.live);
         } catch (DatatypeConfigurationException e) {
             e.printStackTrace();
+        }finally{
+            try {
+                statement.close();
+                connection.close();
+            } catch (Exception ex) {
+                Logger.getLogger(NDRCommonQuestionsDictionary.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
         }
+        
         return null;
     }
 
-    public CommonQuestionsType createCommonQuestionType(Patient pts, List<Encounter> encounters, List<Obs> allObs) throws DatatypeConfigurationException {
+    public CommonQuestionsType createCommonQuestionType(Patient pts, List<CustomEncounter> encounters, OBSUtil obsUtil) throws DatatypeConfigurationException {
         Obs obs = null;
         Date valueDateTime = null;
         int valueCoded = 0;
         String ndrCode = "";
         Boolean ndrBooleanCode = null;
-        try {
-            PatientIdentifier pepfarIdentifier = pts.getPatientIdentifier(Utils.PEPFAR_IDENTIFIER_INDEX);
+        /*try {
+            String pepfarIdentifier = obsUtil.getIdentifier(Utils.PEPFAR_IDENTIFIER_INDEX);//pts.getPatientIdentifier(Utils.PEPFAR_IDENTIFIER_INDEX);
 
             CommonQuestionsType common = new CommonQuestionsType();
             //List<Obs> hivEnrollmentObs = Utils.FilterObsByEncounterTypeId(allObs, Utils.HIV_Enrollment_Encounter_Type_Id); // Utils.getHIVEnrollmentObs(pts);
@@ -424,27 +439,29 @@ public class NDRCommonQuestionsDictionary {
             if (pepfarIdentifier != null) {
 
                 try {
-                    common.setHospitalNumber(pts.getPatientIdentifier(Utils.HOSPITAL_IDENTIFIER_INDEX).getIdentifier());
+                    //common.setHospitalNumber(pts.getPatientIdentifier(Utils.HOSPITAL_IDENTIFIER_INDEX).getIdentifier());
+                    common.setHospitalNumber(obsUtil.getIdentifier(Utils.HOSPITAL_IDENTIFIER_INDEX));
                 } catch (Exception e) {
+                    //common.setHospitalNumber(pts.getPatientIdentifier(Utils.PEPFAR_IDENTIFIER_INDEX).getIdentifier());
                     common.setHospitalNumber(pts.getPatientIdentifier(Utils.PEPFAR_IDENTIFIER_INDEX).getIdentifier());
                 }
                 /*  Assuming Hospital No is 3*/
                 //old code commented for throwing error change by the try and catch code abowe
                 //common.setHospitalNumber(pts.getPatientIdentifier(3).getIdentifier());
-            }
+           // }
 
-            try {
-                Encounter lastEncounterDate = Utils.getLastEncounter(encounters); //(pts);
+            /*try {
+                Encounter lastEncounterDate = encounters.get(encounters.size()-1);//Utils.getLastEncounter(encounters); //(pts);
                 if (lastEncounterDate != null) {
                     common.setDateOfLastReport(getXmlDate(lastEncounterDate.getEncounterDatetime()));
                 }
 
-                Date EnrollmentDate = Utils.extractEnrollmentDate(pts, allObs, encounters);
+                Date EnrollmentDate = Utils.extractEnrollmentDate(pts, obsUtil, encounters);
                 if (EnrollmentDate != null) {
                     common.setDateOfFirstReport(getXmlDate(EnrollmentDate));
                     common.setDiagnosisDate(getXmlDate(EnrollmentDate));
                 }
-                obs = Utils.extractObs(Utils.DATE_OF_HIV_DIAGNOSIS_CONCEPT, allObs);
+                obs = obsUtil.getObsForConcept(Utils.DATE_OF_HIV_DIAGNOSIS_CONCEPT);//Utils.extractObs(Utils.DATE_OF_HIV_DIAGNOSIS_CONCEPT, allObs);
                 if (obs != null) {
                     valueDateTime = obs.getValueDate();
                     common.setDiagnosisDate(getXmlDate(valueDateTime));
@@ -457,7 +474,7 @@ public class NDRCommonQuestionsDictionary {
 
                 //set estimated delivery date concept id
                 //obs = Utils.extractObs(Estimated_Delivery_Date_Concept_Id, hivEnrollmentObs);
-                obs = Utils.getLastObsOfConceptByDate(allObs, Utils.PREGNANCY_BREASTFEEDING_STATUS);
+                obs = Utils.getLastObsOfConceptByDate(obsUtil.getAllObs(), Utils.PREGNANCY_BREASTFEEDING_STATUS);
                 if (obs != null && obs.getValueAsBoolean() != null) {
                     ndrBooleanCode = obs.getValueBoolean();
                     if (ndrBooleanCode == true) {
@@ -473,7 +490,7 @@ public class NDRCommonQuestionsDictionary {
             common.setPatientAge(pts.getAge());
 
             //set Patient Die From This Illness tag
-            obs = Utils.extractObsByValues(Utils.REASON_FOR_TERMINATION_CONCEPT, Utils.DEAD_CONCEPT, allObs);
+            obs = Utils.extractObsByValues(Utils.REASON_FOR_TERMINATION_CONCEPT, Utils.DEAD_CONCEPT, obsUtil.getAllObs());
             if (obs != null) {
                 common.setPatientDieFromThisIllness(Boolean.TRUE);
             } else {
@@ -489,7 +506,8 @@ public class NDRCommonQuestionsDictionary {
         } catch (Exception ex) {
             LoggerUtils.write(NDRMainDictionary.class.getName(), ex.getMessage(), LoggerUtils.LogFormat.FATAL, LoggerUtils.LogLevel.live);
             throw new DatatypeConfigurationException(ex.getMessage());
-        }
+        }*/
+            return null;
     }
 
     /*
@@ -526,10 +544,10 @@ HIVQuestionsType
  -EnrolledInHIVCareDate
  -InitialTBStatus (1659)
      */
-    public HIVQuestionsType createHIVQuestionType(Patient patient, List<Encounter> allEncounterList, List<Obs> allObsList) throws DatatypeConfigurationException {
+    public HIVQuestionsType createHIVQuestionType(Patient patient, List<Encounter> allEncounterList, OBSUtil obsUtil) throws DatatypeConfigurationException {
         Integer[] targetEncounterTypes = {Utils.ADULT_INITIAL_ENCOUNTER_TYPE, Utils.PED_INITIAL_ENCOUNTER_TYPE, Utils.HIV_Enrollment_Encounter_Type_Id, Utils.ART_COMMENCEMENT_ENCOUNTER_TYPE, Utils.Client_Tracking_And_Termination_Encounter_Type_Id};
         HIVQuestionsType hivQuestionsType = null;
-        List<Obs> obsList = Utils.extractObsListForEncounterType(allObsList, targetEncounterTypes);
+        /*List<Obs> obsList = obsUtil.getAllObsForEncounters(targetEncounterTypes);//Utils.extractObsListForEncounterType(allObsList, targetEncounterTypes);
         Obs obs = null;
         int valueCoded = 0, valueNumericInt = 0;
 
@@ -539,7 +557,7 @@ HIVQuestionsType
         CodedSimpleType cst = null;
         if (obsList != null && !obsList.isEmpty()) {
             hivQuestionsType = new HIVQuestionsType();
-            obs = Utils.extractObs(Utils.CARE_ENTRY_POINT_CONCEPT, obsList);
+            obs = obsUtil.getObsForConcept(Utils.CARE_ENTRY_POINT_CONCEPT);//Utils.extractObs(Utils.CARE_ENTRY_POINT_CONCEPT, obsList);
             if (obs != null && obs.getValueCoded() != null) {
                 valueCoded = obs.getValueCoded().getConceptId();
                 ndrCode = getMappedValue(valueCoded);
@@ -614,7 +632,7 @@ HIVQuestionsType
                     hivQuestionsType.setFirstARTRegimen(cst);
                 }
             }
-            Date artStartDate = Utils.extractARTStartDate(patient, allObsList);//Obs(Utils.ART_START_DATE_CONCEPT, obsList);
+            Date artStartDate = Utils.extractARTStartDate(patient, obsUtil.getAllObs());//Obs(Utils.ART_START_DATE_CONCEPT, obsList);
             if (artStartDate != null) {
                 //valueDateTime=obs.getValueDate();
                 hivQuestionsType.setARTStartDate(Utils.getXmlDate(artStartDate));
@@ -663,7 +681,7 @@ HIVQuestionsType
             /*
                 Use date confirmed positve or visit date of the HIVEnrollmentForm
              */
-            Date enrollmentDate = Utils.extractEnrollmentDate(patient, allObsList, allEncounterList);
+           /* Date enrollmentDate = Utils.extractEnrollmentDate(patient, obsUtil, allEncounterList);
             if (enrollmentDate != null) {
                 hivQuestionsType.setEnrolledInHIVCareDate(Utils.getXmlDate(enrollmentDate));
             }
@@ -674,14 +692,14 @@ HIVQuestionsType
                 hivQuestionsType.setInitialTBStatus(ndrCode);
             }
 
-        }
+        }*/
         return hivQuestionsType;
 
     }
 
-    public ConditionSpecificQuestionsType createConditionSpecificQuestionType(Patient patient, List<Encounter> allEncounterList, List<Obs> allObsList) throws DatatypeConfigurationException {
+    public ConditionSpecificQuestionsType createConditionSpecificQuestionType(Patient patient, List<Encounter> allEncounterList, OBSUtil obsUtil) throws DatatypeConfigurationException {
         ConditionSpecificQuestionsType conditionSpecificQuestion = new ConditionSpecificQuestionsType();
-        HIVQuestionsType hivQuestionType = createHIVQuestionType(patient, allEncounterList, allObsList);
+        HIVQuestionsType hivQuestionType = createHIVQuestionType(patient, allEncounterList, obsUtil);
         conditionSpecificQuestion.setHIVQuestions(hivQuestionType);
         return conditionSpecificQuestion;
     }

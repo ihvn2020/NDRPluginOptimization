@@ -82,7 +82,7 @@ public class LoggerUtils {
 	}
 	
 	private static void log(String className, String logText, LogFormat formater, LogLevel level) throws IOException {
-		String folder = Paths.get(System.getProperty("user.home"), "NMRS_LOGS").toString();
+		/*String folder = Paths.get(System.getProperty("user.home"), "NMRS_LOGS").toString();
 		File dir = new File(folder);
 		if (!dir.exists()) {
 			dir.mkdir();
@@ -106,7 +106,8 @@ public class LoggerUtils {
 		}
 		catch (IOException ex) {
 			Logger.getLogger(LoggerUtils.class.getName()).log(Level.SEVERE, null, ex);
-		}
+		}*/
+		System.out.println(className + "_" + logText);
 	}
 	
 	public static void write(String className, String logText, LogFormat formater, LogLevel level) {
@@ -122,7 +123,8 @@ public class LoggerUtils {
 			
 		}
 		catch (Exception ex) {
-			Logger.getLogger(LoggerUtils.class.getName()).log(Level.SEVERE, null, ex);
+			ex.printStackTrace();
+			//Logger.getLogger(LoggerUtils.class.getName()).log(Level.SEVERE, null, ex);
 		}
 		
 	}

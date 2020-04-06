@@ -44,6 +44,9 @@
 				<artifactId>poi-ooxml</artifactId>
 				<version>3.15</version>
 			</dependency>
+                        <!-- https://mvnrepository.com/artifact/org.mariadb.jdbc/mariadb-java-client -->
+                
+
 
 		</dependencies>
 	</dependencyManagement>

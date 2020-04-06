@@ -2,6 +2,7 @@ package org.openmrs.module.nigeriaemr.fragment.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.BufferedWriter;
 import org.openmrs.Patient;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.nigeriaemr.model.ndr.Container;
@@ -15,6 +16,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.datatype.DatatypeConfigurationException;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -23,20 +25,39 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import org.openmrs.Encounter;
 import org.openmrs.module.nigeriaemr.ndrUtils.LoggerUtils;
 import org.openmrs.module.nigeriaemr.ndrUtils.LoggerUtils.LogFormat;
 import org.openmrs.module.nigeriaemr.ndrUtils.LoggerUtils.LogLevel;
+import org.openmrs.module.nigeriaemr.ndrfactory.NDRConverterUpdated;
 import org.openmrs.module.nigeriaemr.omodmodels.DBConnection;
 import org.openmrs.module.nigeriaemr.omodmodels.FacilityLocation;
 import org.openmrs.module.nigeriaemr.omodmodels.LocationModel;
 import org.openmrs.module.nigeriaemr.omodmodels.PatientLocation;
 import org.openmrs.module.nigeriaemr.service.FacilityLocationService;
+import org.openmrs.module.nigeriaemr.xmlgenerator.XMLGenerator;
 import org.springframework.web.bind.annotation.RequestParam;
 
 public class NdrFragmentController {
+	
+	public static JAXBContext jaxbContext;
+	public static String facName = Utils.getFacilityName();
+	public static String DatimId = Utils.getFacilityDATIMId();
+        public static String facilityType = "FAC";
+	static {
+		try {
+			jaxbContext = JAXBContext.newInstance("org.openmrs.module.nigeriaemr.model.ndr");
+		}
+		catch (JAXBException ex) {
+			ex.printStackTrace();
+		}
+	}
+        List <Patient>listOfPatients = new ArrayList<>();
 	
 	public void controller() {
 		
@@ -73,10 +94,10 @@ public class NdrFragmentController {
         //pts = Context.getPatientService().getPatient(28417);
         //patients.add(pts);
 
-   
+        
         String FacilityType = "FAC";
-     
-        return startGenerateFile(request, openmrsConn, filteredPatients, facilityLocation.getFacility_name(), facilityLocation.getDatimCode(), FacilityType);
+        return "Completed from first version ";
+        //return startGenerateFile(request, openmrsConn, filteredPatients, facilityLocation.getFacility_name(), facilityLocation.getDatimCode(), FacilityType);
     }
 	
 	public String generateNDRFile(HttpServletRequest request) throws DatatypeConfigurationException, IOException,
@@ -88,8 +109,10 @@ public class NdrFragmentController {
 		LoggerUtils.checkLoggerGlobalProperty(openmrsConn);
 		LoggerUtils.clearLogFile();
 		
-		List<Patient> patients = Context.getPatientService().getAllPatients();
-		
+		//List<Patient> patients = Context.getPatientService().getAllPatients();
+		String startDate = request.getParameter("startDate")+" 00:00:00";
+                String endDate = request.getParameter("endDate")+" 23:59:59";
+                System.out.println("start date: "+startDate);
 		//Patient pts = null;
 		//List<Patient> patients = new ArrayList<Patient>();
 		//pts = Context.getPatientService().getPatient(28417);
@@ -98,12 +121,34 @@ public class NdrFragmentController {
 		String facilityName = Utils.getFacilityName();
 		String DATIMID = Utils.getFacilityDATIMId();
 		String FacilityType = "FAC";
+		int counter = 1;
+		Utils util = new Utils();
+                String reportType = "NDR";
+                String reportFolder = util.ensureReportFolderExist(request, reportType);
 		
-		return startGenerateFile(request, openmrsConn, patients, facilityName, DATIMID, FacilityType);
+                XMLGenerator xml = new XMLGenerator(reportFolder, openmrsConn, startDate, endDate);
+		xml.startGenerating();
+                
+                
+               // XMLGenerator generator = new XMLGenerator();
+                //generator.startGenerating();
+                //return "hello";
+                
+                String formattedDate = new SimpleDateFormat("ddMMyy").format(new Date());
+                //String zipFileName = IPShortName + "_ " + facilityName + "_" + DATIMID + "_" + formattedDate + ".zip";
+                String zipFileName =   formattedDate + ".zip";
+                //String response = "Files Exported successfully, view uploaded files here: \n"
+                  //      + util.ZipFolder(request, reportFolder, zipFileName, reportType);*/
+                String response = util.ZipFolder(request, reportFolder, zipFileName, reportType);
+                //return response;
+                ///return "file.zip";
+                //String zipFileName = IPShortName + "_ " + facilityName + "_" + DATIMID + "_" + formattedDate + ".zip";
+                return request.getContextPath() + "/downloads/NDR/" + zipFileName;
+		//return startGenerateFile(request, openmrsConn, patients, facilityName, DATIMID, FacilityType);
 		
 	}
 	
-	private static String startGenerateFile(HttpServletRequest request, DBConnection openmrsConn,
+	private  String startGenerateFile(HttpServletRequest request, DBConnection openmrsConn,
 	        List<Patient> filteredPatients, String facilityName, String DATIMID, String FacilityType) throws JAXBException,
 	        SAXException {
 		
@@ -115,8 +160,8 @@ public class NdrFragmentController {
 		String IPShortName = Utils.getIPShortName();
 		
 		//Create an xml file and save in today's folder
-		NDRConverter generator = new NDRConverter(Utils.getIPFullName(), IPShortName, openmrsConn);
-		JAXBContext jaxbContext = JAXBContext.newInstance("org.openmrs.module.nigeriaemr.model.ndr");
+		NDRConverterUpdated generator = new NDRConverterUpdated(Utils.getIPFullName(), IPShortName, openmrsConn);
+		//JAXBContext jaxbContext = JAXBContext.newInstance("org.openmrs.module.nigeriaemr.model.ndr");
 		Marshaller jaxbMarshaller = generator.createMarshaller(jaxbContext);
 		
 		String formattedDate = new SimpleDateFormat("ddMMyy").format(new Date());
@@ -127,88 +172,178 @@ public class NdrFragmentController {
 			
 			long loop_start_time = System.currentTimeMillis();
 			int counter = 0;
-			Container cnt = null;
+			//Container cnt = null;
+			ExecutorService executor = Executors.newFixedThreadPool(10);
+			//BufferedWriter writer = null;
 			for (Patient patient : filteredPatients) {
+				String pepFarId = Utils.getPatientPEPFARId(patient);
+				if (pepFarId != null) { //remove forward slashes / from file names
+					pepFarId = pepFarId.replace("/", "_").replace(".", "_");
+				} else {
+					pepFarId = "";
+				}
+                                String fileName = IPShortName + "_" + DATIMID + "_" + formattedDate + "_" + pepFarId;
+                                listOfPatients.add(patient);
+                                List<Encounter> encs = Context.getEncounterService().getEncountersByPatient(patient);//I expect that this brought all the encounters
+                                List<Encounter> filteredEncs = new ArrayList<>();
+                                Date lastDate = Utils.getLastNDRDate();
+
+                                try {
+
+                                    //only run if patient has had any encounter between the last run date and now
+                                    //LocalDate firstDate = LocalDate.of
+                                    encs.forEach((enc) -> {
+                                        int dateCreatedComp = enc.getDateCreated().compareTo(lastDate);
+                                        int dateModifiedComp = -1;
+                                        if (enc.getDateChanged() != null) {
+                                            dateModifiedComp = enc.getDateChanged().compareTo(lastDate);
+                                        }
+                                        if (dateCreatedComp > -1 || dateModifiedComp > -1) {
+                                            filteredEncs.add(enc);
+                                        }
+                                    });//                if (lastDate != null) {
+                    //                    encs = encs.stream()
+                    //                            .filter(e -> e.getDateCreated().after(lastDate)
+                    //                            || e.getDateChanged().after(lastDate) || e.getDateCreated().equals(lastDate) || e.getDateChanged().equals(lastDate)).collect(Collectors.toList());
+                    //                }
+
+                                } catch (Exception ex) {
+                                    System.out.println(ex.getMessage());
+                                }
+                                Container cnt = null;
+                                OBSUtil obsObj = new OBSUtil();
+                                ///obsObj.setPatientObs(Utils.extractObsfromEncounter(filteredEncs));
+                                obsObj.setPatientIdentifies(patient);
+                                //cnt = generator.createContainer(patient, facility, obsObj, filteredEncs);
+                                System.out.println("processing "+counter+" out of "+filteredPatients.size());
+				//new GenerateXMLFiles().generateXMLFile(patient, pepFarId, counter, filteredPatients.size(), generator,
+				//  facility, reportFolder, IPShortName, x, jaxbContext, formattedDate);
+				counter++; 
+				if (counter > 4000)
+					break;
+				
+                                
+				//for (int i = 0; i < 10; i++) {
+				//Patient p = patient;
+				//Runnable worker = new BackgroundTask(patient, counter, filteredPatients.size(), cnt, openmrsConn, facility,
+				//reportFolder, IPShortName, DATIMID, jaxbContext, formattedDate);
+				/*Runnable worker = new BackgroundTask2(generator, cnt, jaxbMarshaller, fileName);
+				executor.execute(worker);
+                                Context.evictFromSession(patient);
+                                Context.evictFromSession(cnt);
+                                //Context.flushSession();
+                                Context.clearSession();
+                                if (counter % 100 == 0) {
+                                        System.gc();
+                                }*/
+				//System.out.println(patient);
+				//if (counter > 50)
+				//	break;
+				
+				//if (counter > 1)
+				//	break;
+				//}
 				
 				long startTime = System.currentTimeMillis();
-				counter++;
-				System.out.println("pateint  " + counter + " of " + filteredPatients.size() + " with ID " + patient.getId());
+				//counter++;
+				//System.out.println("pateint  " + counter + " of " + filteredPatients.size() + " with ID " + patient.getId());
 				
 				//	if (patient.getId() == 497) {
 				try {
-					LoggerUtils.write(NdrFragmentController.class.getName(),
-					    "#################### #################### ####################", LogFormat.FATAL, LogLevel.live);
-					LoggerUtils.write(NdrFragmentController.class.getName(), "Started Export for patient with id: "
-					        + patient.getId(), LoggerUtils.LogFormat.INFO, LogLevel.live);
+					//LoggerUtils.write(NdrFragmentController.class.getName(),
+					//"#################### #################### ####################", LogFormat.FATAL, LogLevel.live);
+					//LoggerUtils.write(NdrFragmentController.class.getName(), "Started Export for patient with id: "
+					// + patient.getId(), LoggerUtils.LogFormat.INFO, LogLevel.live);
 					
-					cnt = generator.createContainer(patient, facility);
+					///cnt = generator.createContainer(patient, facility);
+                                        cnt = generator.createContainer(patient, facility, obsObj, filteredEncs);
+					System.out.println("did not throw error");
 					
 				}
 				catch (Exception ex) {
-					LoggerUtils.write(
-					    NdrFragmentController.class.getName(),
-					    MessageFormat.format("Could not parse patient with id: {0},{1},{2} ",
-					        Integer.toString(patient.getId()), "\r\n", ex.getMessage()), LogFormat.FATAL, LogLevel.live);
+					System.out.println("threw error");
+					//LoggerUtils.write(
+					// NdrFragmentController.class.getName(),
+					//MessageFormat.format("Could not parse patient with id: {0},{1},{2} ",
+					//  Integer.toString(patient.getId()), "\r\n", ex.getMessage()), LogFormat.FATAL, LogLevel.live);
 					cnt = null;
 				}
 				
 				if (cnt != null) {
-					LoggerUtils.write(NdrFragmentController.class.getName(),
-					    "Got data for patient with ID: " + patient.getId(), LogFormat.INFO, LogLevel.live);
+					//LoggerUtils.write(NdrFragmentController.class.getName(),
+					//  "Got data for patient with ID: " + patient.getId(), LogFormat.INFO, LogLevel.live);
 					try {
 						
-						String pepFarId = Utils.getPatientPEPFARId(patient);
+						//String pepFarId = Utils.getPatientPEPFARId(patient);
 						
 						if (pepFarId != null) { //remove forward slashes / from file names
 							pepFarId = pepFarId.replace("/", "_").replace(".", "_");
 						} else {
 							pepFarId = "";
 						}
-						
-						String fileName = IPShortName + "_" + DATIMID + "_" + formattedDate + "_" + pepFarId;
+						System.out.println("Pepfar "+pepFarId);
+						//String fileName = IPShortName + "_" + DATIMID + "_" + formattedDate + "_" + pepFarId;
 						
 						// old implementation		String xmlFile = reportFolder + "\\" + fileName + ".xml";
-						String xmlFile = Paths.get(reportFolder, fileName + ".xml").toString();
+						//String xmlFile = Paths.get(reportFolder, fileName + ".xml").toString();
 						
 						//  Path xmlFilePath = Paths.get(reportFolder, fileName + ".xml");
-						
-						File aXMLFile = new File(xmlFile);
+						String xmlFile = Paths.get(reportFolder, fileName + ".xml").toString();
+						/*File aXMLFile = new File(xmlFile);
 						Boolean b;
 						if (aXMLFile.exists()) {
 							b = aXMLFile.delete();
 							System.out.println("deleting file : " + xmlFile + "was successful : " + b);
-						}
-						b = aXMLFile.createNewFile();
+						}*/
+						//b = aXMLFile.createNewFile();
 						
-						System.out.println("creating xml file : " + xmlFile + "was successful : " + b);
-						generator.writeFile(cnt, aXMLFile, jaxbMarshaller);
+						//System.out.println("creating xml file : " + xmlFile + "was successful : " + b);
+						Runnable worker = new BackgroundTask2(generator, cnt, jaxbMarshaller, xmlFile);
+						executor.execute(worker);
+						//generator.writeFile(cnt, aXMLFile, jaxbMarshaller);
+                                                //GenerateXMLFiles2 f = new GenerateXMLFiles2(generator, cnt, jaxbMarshaller, xmlFile);
+                                                //f.generateXMLFile(generator, cnt, jaxbMarshaller, xmlFile);
+						Context.evictFromSession(patient);
+						//Context.evictFromSession(cnt);
+						//Context.flushSession();
+						//Context.clearSession();
+						if (counter % 100 == 0) {
+							System.gc();
+						}
 					}
 					catch (Exception ex) {
-						LoggerUtils.write(NdrFragmentController.class.getName(), ex.getMessage(), LogFormat.FATAL,
-						    LogLevel.live);
+						//LoggerUtils.write(NdrFragmentController.class.getName(), ex.getMessage(), LogFormat.FATAL,
+                                            ex.printStackTrace();;
 					}
-				}
+				} //comments end here*/
+                                else{
+                                    System.out.println("container is null");
+                                }
 				
-				long endTime = System.currentTimeMillis();
+				/*long endTime = System.currentTimeMillis();
 				LoggerUtils.write(NdrFragmentController.class.getName(),
 				    "Finished Export for patient with id: " + patient.getId() + " Time Taken: " + (endTime - startTime)
 				            + " milliseconds", LoggerUtils.LogFormat.INFO, LogLevel.live);
 				System.out.println("generating ndr took : " + (endTime - startTime) + " milli secs : ");
 				
 				long loop_end_time = System.currentTimeMillis();
-				System.out.println("generating ndr took : " + (loop_end_time - loop_start_time) + " milli secs : ");
+				System.out.println("generating ndr took : " + (loop_end_time - loop_start_time) + " milli secs : ");*/
 				//	}
 			}
+			//executor.shutdown();
 			
 			//Update ndr last run date
-			Utils.updateLast_NDR_Run_Date(new Date());
+			//Utils.updateLast_NDR_Run_Date(new Date());
 			
 			String zipFileName = IPShortName + "_ " + facilityName + "_" + DATIMID + "_" + formattedDate + ".zip";
 			/*String response = "Files Exported successfully, view uploaded files here: \n"
 			        + util.ZipFolder(request, reportFolder, zipFileName, reportType);*/
-			String response = util.ZipFolder(request, reportFolder, zipFileName, reportType);
-			return response;
-			//request.getContextPath() + "/downloads/" + zipFileName;
+			//String response = util.ZipFolder(request, reportFolder, zipFileName, reportType);
+			//return response;
+			///return "file.zip";
+			//String zipFileName = IPShortName + "_ " + facilityName + "_" + DATIMID + "_" + formattedDate + ".zip";
+			return request.getContextPath() + "/downloads/" + zipFileName;
+			//return "Completed here";
 		}
 		catch (Exception ex) {
 			LoggerUtils.write(NdrFragmentController.class.getName(), ex.getMessage(), LoggerUtils.LogFormat.FATAL,

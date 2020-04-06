@@ -1,4 +1,4 @@
-package org.openmrs.module.nigeriaemr.ndrfactory;
+package org.openmrs.module.nigeriaemr.ndrfactory2;
 
 import com.mchange.v2.encounter.EncounterCounter;
 import org.openmrs.Encounter;
@@ -24,6 +24,9 @@ import org.openmrs.module.nigeriaemr.ndrUtils.LoggerUtils.LogLevel;
 
 import static org.openmrs.module.nigeriaemr.ndrUtils.Utils.getXmlDate;
 import org.openmrs.module.nigeriaemr.omodmodels.DBConnection;
+import org.openmrs.module.nigeriaemr.xmlgenerator.CustomEncounter;
+import org.openmrs.module.nigeriaemr.xmlgenerator.CustomObs;
+import org.openmrs.module.nigeriaemr.xmlgenerator.CustomPatient;
 
 //on master
 public class NDRMainDictionary {
@@ -185,28 +188,29 @@ public class NDRMainDictionary {
     /*static HIVQuestionsType createHIVQuestionType(Obs firstRegimenObs, Date ARTStartDate, Date EnrollmentDate, List<Obs> obs) {
 		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 	}*/
-    public PatientDemographicsType createPatientDemographicType2(Patient patient, FacilityType facility, DBConnection openmrsConn, List<Encounter> allPatientEncounterList, OBSUtil obsUtil) throws DatatypeConfigurationException {
-        return commonQuestionDictionary.createPatientDemographicsType(patient, facility, obsUtil, allPatientEncounterList, openmrsConn);
+    public PatientDemographicsType createPatientDemographicType2(CustomPatient patient, FacilityType facility, OBSUtil allPatientObsList, Map<Integer, IdentifierType>allPatientIdentifier) throws DatatypeConfigurationException {
+        return commonQuestionDictionary.createPatientDemographicsType(patient, facility, allPatientObsList, allPatientIdentifier);
     }
-
-    public CommonQuestionsType createCommonQuestionType2(Patient patient, List<Encounter> allPatientEncounterList, OBSUtil obsUtil) throws DatatypeConfigurationException {
+    
+    public CommonQuestionsType createCommonQuestionType2(CustomPatient patient, Map<Integer, List<CustomEncounter>> allPatientEncounterList, Map<Integer, Set<Date>> uniqueEncounters, OBSUtil allPatientObsList, Map<Integer, IdentifierType>allPatientIdentifier) throws DatatypeConfigurationException {
         CommonQuestionsType commonQuestionsType = null;
-       // commonQuestionsType = commonQuestionDictionary.createCommonQuestionType(patient, allPatientEncounterList, obsUtil);
+       
+        commonQuestionsType = commonQuestionDictionary.createCommonQuestionType(patient, allPatientEncounterList, uniqueEncounters, allPatientObsList, allPatientIdentifier);
         return commonQuestionsType;
     }
 
-    public ConditionSpecificQuestionsType createCommConditionSpecificQuestionsType(Patient patient, List<Encounter> allPatientEncounterList, OBSUtil obsUtil) throws DatatypeConfigurationException {
-        return commonQuestionDictionary.createConditionSpecificQuestionType(patient, allPatientEncounterList, obsUtil);
+    public ConditionSpecificQuestionsType createCommConditionSpecificQuestionsType(CustomPatient patient, Map<Integer, List<CustomEncounter>> allPatientEncounterList, Map<Integer, Set<Date>> uniqueEncounters, OBSUtil allPatientObsList, Map<Integer, IdentifierType>allPatientIdentifier) throws DatatypeConfigurationException {
+        return commonQuestionDictionary.createConditionSpecificQuestionType(patient, allPatientEncounterList, uniqueEncounters, allPatientObsList, allPatientIdentifier);
     }
 
-    public List<HIVEncounterType> createHIVEncounterType(Patient patient, List<Encounter> allPatientEncounterList, List<Obs> allObs) throws DatatypeConfigurationException {
-        return clinicalDictionary.createHIVEncounterType(patient, allPatientEncounterList, allObs);
+    public List<HIVEncounterType> createHIVEncounterType(CustomPatient patient, Map<Integer, List<CustomEncounter>> allPatientEncounterList, Map<Integer, Set<Date>> uniqueEncounters, OBSUtil obsUtil, Map<Integer, IdentifierType>allPatientIdentifier) throws DatatypeConfigurationException {
+        return clinicalDictionary.createHIVEncounterType(patient, allPatientEncounterList, uniqueEncounters, obsUtil, allPatientIdentifier);
     }
 
-    public List<RegimenType> createRegimenTypeList(Patient patient, List<Encounter> allEncounterForPatient, OBSUtil obsUtil) throws DatatypeConfigurationException {
+    public List<RegimenType> createRegimenTypeList(CustomPatient pts, OBSUtil obsUtil,  Map<Integer, List<CustomEncounter>> allPatientEncounterList, Map<Integer, Set<Date>> uniqueEncounters,  Map<Integer, IdentifierType>allPatientIdentifier) throws DatatypeConfigurationException {
         List<RegimenType> allRegimenTypeList = new ArrayList<RegimenType>();
-        //allRegimenTypeList.addAll(pharmDictionary.createRegimenTypeList(patient, allEncounterForPatient, obsUtil.getAllObs()));
-        //allRegimenTypeList.addAll(pharmDictionary.createOIRegimenTypeList(patient, allEncounterForPatient, obsUtil.getAllObs()));
+        allRegimenTypeList.addAll(pharmDictionary.createRegimenTypeList(pts, obsUtil,  allPatientEncounterList, uniqueEncounters,  allPatientIdentifier));
+        allRegimenTypeList.addAll(pharmDictionary.createOIRegimenTypeList(pts, obsUtil,  allPatientEncounterList, uniqueEncounters,  allPatientIdentifier));
         return allRegimenTypeList;
 
     }
@@ -215,9 +219,9 @@ public class NDRMainDictionary {
             throws DatatypeConfigurationException {
         return labDictionary.createLaboratoryOrderAndResult(pts, enc, labObsList );
     }*/
-    public LaboratoryReportType createLaboratoryOrderAndResult(Patient pts, Encounter enc, OBSUtil obsUtil, Date artStartDate)
+    public LaboratoryReportType createLaboratoryOrderAndResult(CustomPatient patient, CustomEncounter encounter, Map<Integer, List<CustomEncounter>> allPatientEncounterList, Map<Integer, Set<Date>> uniqueEncounters, OBSUtil obsUtil, Map<Integer, IdentifierType>allPatientIdentifier, Date artStartDate)
             throws DatatypeConfigurationException {
-        return labDictionary.createLaboratoryOrderAndResult(pts, enc, obsUtil, artStartDate);
+        return labDictionary.createLaboratoryOrderAndResult(patient, encounter, allPatientEncounterList,  uniqueEncounters, obsUtil, allPatientIdentifier, artStartDate);
     }
 /*
     public ChildBirthDetailsType createChildBirthDetailsType(Patient pts, List<Encounter> enc, List<Obs> antenatalObsList) throws DatatypeConfigurationException {
@@ -236,10 +240,10 @@ public class NDRMainDictionary {
         return pmtctDictionary.createInfantPcr(pts, null, antenatalObsList);
     }
 */
-    public List<ClinicalTBScreeningType> createClinicalTbScreening(Patient pts, Encounter encounters, List<Obs> obsList) throws DatatypeConfigurationException {
+    public List<ClinicalTBScreeningType> createClinicalTbScreening(CustomPatient patient, CustomEncounter enc, Map<Integer, List<CustomObs>> intakeObs, Map<Integer, List<CustomEncounter>>allEncounters, Map<Integer, Set<Date>> uniqueEncounters, Map<Integer, IdentifierType> allPatientIdentifiers, OBSUtil obsUtil) throws DatatypeConfigurationException {
         List<ClinicalTBScreeningType> clinicalTBScreeningTypes = new ArrayList<>();
 
-        ClinicalTBScreeningType clinicalTBScreeningType = htsDictionary.createClinicalTbScreening(pts, encounters, obsList);
+        ClinicalTBScreeningType clinicalTBScreeningType = htsDictionary.createClinicalTbScreening(patient, enc, intakeObs, allEncounters, uniqueEncounters, allPatientIdentifiers,  obsUtil);
         if (clinicalTBScreeningType != null) {
             clinicalTBScreeningTypes.add(clinicalTBScreeningType);
         }
@@ -247,29 +251,29 @@ public class NDRMainDictionary {
         return clinicalTBScreeningTypes;
     }
 
-    public HIVTestingReportType createHIVTestIntake(Patient patient, Encounter enc, List<Obs> allObs, HIVTestingReportType hivTestingReport) {
+    public HIVTestingReportType createHIVTestIntake(CustomPatient patient, CustomEncounter enc, Map<Integer, List<CustomObs>> intakeObs, Map<Integer, List<CustomEncounter>>allEncounters, Map<Integer, Set<Date>> uniqueEncounters, Map<Integer, IdentifierType> allPatientIdentifiers, OBSUtil obsUtil, HIVTestingReportType hivTestingReport) {
 
         try {
-            return htsDictionary.createClientIntakeTags(patient, enc, allObs, hivTestingReport);
+            return htsDictionary.createClientIntakeTags(patient, enc, intakeObs, allEncounters, uniqueEncounters, allPatientIdentifiers, obsUtil,  hivTestingReport);
         } catch (Exception ex) {
             LoggerUtils.write(NDRMainDictionary.class.getName(), ex.getMessage(), LogFormat.FATAL, LogLevel.live);
         }
         return hivTestingReport;
     }
 
-    public HIVTestResultType createHIVTestResult(Patient patient, Encounter enc, List<Obs> allObs) {
-        return htsDictionary.createHIVTestResult(patient, enc, allObs);
+    public HIVTestResultType createHIVTestResult(CustomPatient patient, CustomEncounter enc, Map<Integer, List<CustomObs>> intakeObs, Map<Integer, List<CustomEncounter>>allEncounters, Map<Integer, Set<Date>> uniqueEncounters, Map<Integer, IdentifierType> allPatientIdentifiers, OBSUtil obsUtil) {
+        return htsDictionary.createHIVTestResult(patient, enc, intakeObs, allEncounters, uniqueEncounters, allPatientIdentifiers, obsUtil);
     }
 
-    public IndexNotificationServicesType createIndexNotificationServicesTypes(Patient patient, Encounter enc, List<Obs> allObs) {        
-      IndexNotificationServicesType  indexNotificationServicesType = htsDictionary.createIndexNotificationServicesTypes(patient, enc, allObs);
+    public IndexNotificationServicesType createIndexNotificationServicesTypes(CustomPatient patient, CustomEncounter enc, Map<Integer, List<CustomObs>> intakeObs, Map<Integer, List<CustomEncounter>>allEncounters, Map<Integer, Set<Date>> uniqueEncounters, Map<Integer, IdentifierType> allPatientIdentifiers, OBSUtil obsUtil) {        
+      IndexNotificationServicesType  indexNotificationServicesType = htsDictionary.createIndexNotificationServicesTypes(patient, enc, intakeObs, allEncounters, uniqueEncounters, allPatientIdentifiers,  obsUtil);
         return indexNotificationServicesType;
     }
 
-    public List<HIVRiskAssessmentType> createHivRiskAssessment(Patient pts, Encounter encounters, List<Obs> obsList) throws DatatypeConfigurationException {
+    public List<HIVRiskAssessmentType> createHivRiskAssessment(CustomPatient patient, CustomEncounter enc, Map<Integer, List<CustomObs>> intakeObs, Map<Integer, List<CustomEncounter>>allEncounters, Map<Integer, Set<Date>> uniqueEncounters, Map<Integer, IdentifierType> allPatientIdentifiers, OBSUtil obsUtil) throws DatatypeConfigurationException {
         List<HIVRiskAssessmentType> hivRiskAssessmentTypes = new ArrayList<>();
 
-        HIVRiskAssessmentType hivRiskAssessmentType = htsDictionary.createHivRiskAssessment(pts, encounters, obsList);
+        HIVRiskAssessmentType hivRiskAssessmentType = htsDictionary.createHivRiskAssessment(patient, enc, intakeObs, allEncounters, uniqueEncounters, allPatientIdentifiers,  obsUtil);
         if (hivRiskAssessmentType != null) {
             hivRiskAssessmentTypes.add(hivRiskAssessmentType);
         }
@@ -277,9 +281,9 @@ public class NDRMainDictionary {
         return hivRiskAssessmentTypes;
     }
 
-    public List<KnowledgeAssessmentType> createKnowledgeAssessmentType(Patient pts, Encounter encounters, List<Obs> obsList) throws DatatypeConfigurationException {
+    public List<KnowledgeAssessmentType> createKnowledgeAssessmentType(CustomPatient patient, CustomEncounter enc, Map<Integer, List<CustomObs>> intakeObs, Map<Integer, List<CustomEncounter>>allEncounters, Map<Integer, Set<Date>> uniqueEncounters, Map<Integer, IdentifierType> allPatientIdentifiers, OBSUtil obsUtil) throws DatatypeConfigurationException {
         List<KnowledgeAssessmentType> knowledgeAssessmentTypes = new ArrayList<>();
-        KnowledgeAssessmentType knowledgeAssessmentType = htsDictionary.createKnowledgeAssessmentType(pts, encounters, obsList);
+        KnowledgeAssessmentType knowledgeAssessmentType = htsDictionary.createKnowledgeAssessmentType(patient, enc, intakeObs, allEncounters, uniqueEncounters, allPatientIdentifiers,  obsUtil);
         if (knowledgeAssessmentType != null) {
             knowledgeAssessmentTypes.add(knowledgeAssessmentType);
         }
@@ -287,10 +291,10 @@ public class NDRMainDictionary {
         return knowledgeAssessmentTypes;
     }
 
-    public List<PostTestCounsellingType> createPostTestCounsellingType(Patient pts, Encounter encounters, List<Obs> obsList) throws DatatypeConfigurationException {
+    public List<PostTestCounsellingType> createPostTestCounsellingType(CustomPatient patient, CustomEncounter enc, Map<Integer, List<CustomObs>> intakeObs, Map<Integer, List<CustomEncounter>>allEncounters, Map<Integer, Set<Date>> uniqueEncounters, Map<Integer, IdentifierType> allPatientIdentifiers, OBSUtil obsUtil) throws DatatypeConfigurationException {
         List<PostTestCounsellingType> postTestCounsellingTypes = new ArrayList<>();
 
-        PostTestCounsellingType postTestCounsellingType = htsDictionary.createPostTestCouncellingType(pts, encounters, obsList);
+        PostTestCounsellingType postTestCounsellingType = htsDictionary.createPostTestCouncellingType(patient, enc, intakeObs, allEncounters, uniqueEncounters, allPatientIdentifiers,  obsUtil);
         if (postTestCounsellingType != null) {
             postTestCounsellingTypes.add(postTestCounsellingType);
         }
@@ -298,10 +302,10 @@ public class NDRMainDictionary {
         return postTestCounsellingTypes;
     }
 
-    public List<SyndromicSTIScreeningType> createSyndromicsStiType(Patient pts, Encounter encounters, List<Obs> obsList) throws DatatypeConfigurationException {
+    public List<SyndromicSTIScreeningType> createSyndromicsStiType(CustomPatient patient, CustomEncounter enc, Map<Integer, List<CustomObs>> intakeObs, Map<Integer, List<CustomEncounter>>allEncounters, Map<Integer, Set<Date>> uniqueEncounters, Map<Integer, IdentifierType> allPatientIdentifiers, OBSUtil obsUtil) throws DatatypeConfigurationException {
         List<SyndromicSTIScreeningType> syndromicSTIScreeningTypes = new ArrayList<>();
 
-        SyndromicSTIScreeningType syndromicSTIScreeningType = htsDictionary.createSyndromicsStiType(pts, encounters, obsList);
+        SyndromicSTIScreeningType syndromicSTIScreeningType = htsDictionary.createSyndromicsStiType(patient, enc, intakeObs, allEncounters, uniqueEncounters, allPatientIdentifiers,  obsUtil);
         if (syndromicSTIScreeningType != null) {
             syndromicSTIScreeningTypes.add(syndromicSTIScreeningType);
         }
@@ -320,18 +324,26 @@ public class NDRMainDictionary {
         return healthFacilityVisitsTypes;
     }
 
-    public List<PartnerDetailsType> createPartnerDetails(Patient pts, List<Encounter> encounters, OBSUtil obsUtil) throws DatatypeConfigurationException {
+    public List<PartnerDetailsType> createPartnerDetails(CustomPatient pts, OBSUtil obsUtil,  Map<Integer, List<CustomEncounter>> allPatientEncounterList, Map<Integer, Set<Date>> uniqueEncounters,  Map<Integer, IdentifierType>allPatientIdentifier) throws DatatypeConfigurationException {
 
         List<PartnerDetailsType> partnerDetailsTypes = new ArrayList<>();
        try{
-           for (Encounter enc : encounters) {
+           /*for (CustomEncounter enc : encounters) {
                if (enc.getEncounterType().getEncounterTypeId() == Utils.Partner_register_Encounter_Id) {
-                   PartnerDetailsType p_details = htsDictionary.createPartnerDetails(pts, enc, obsUtil);
+                   PartnerDetailsType p_details = htsDictionary.createPartnerDetails(pts, enc, obsList);
                    if (p_details != null) {
                        partnerDetailsTypes.add(p_details);
                    }
                }
+           }*/
+           if(allPatientEncounterList.containsKey(Utils.Partner_register_Encounter_Id))
+           {
+               PartnerDetailsType p_details = htsDictionary.createPartnerDetails(pts, obsUtil,  allPatientEncounterList, uniqueEncounters,  allPatientIdentifier);
+                   if (p_details != null) {
+                       partnerDetailsTypes.add(p_details);
+                   }
            }
+           
        }catch(Exception ex){
            LoggerUtils.write(NDRMainDictionary.class.getName(),ex.getMessage(),LogFormat.WARNING,LogLevel.debug);
        }
